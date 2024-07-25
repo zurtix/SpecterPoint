@@ -17,7 +17,6 @@ import { Route as TargetsImport } from './routes/targets'
 import { Route as ConfigurationImport } from './routes/configuration'
 import { Route as BlacklistImport } from './routes/blacklist'
 import { Route as ServersViewImport } from './routes/servers.view'
-import { Route as ServersCreateImport } from './routes/servers.create'
 import { Route as ListenersViewImport } from './routes/listeners.view'
 
 // Create Virtual Routes
@@ -48,11 +47,6 @@ const IndexLazyRoute = IndexLazyImport.update({
 
 const ServersViewRoute = ServersViewImport.update({
   path: '/servers/view',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const ServersCreateRoute = ServersCreateImport.update({
-  path: '/servers/create',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -100,13 +94,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListenersViewImport
       parentRoute: typeof rootRoute
     }
-    '/servers/create': {
-      id: '/servers/create'
-      path: '/servers/create'
-      fullPath: '/servers/create'
-      preLoaderRoute: typeof ServersCreateImport
-      parentRoute: typeof rootRoute
-    }
     '/servers/view': {
       id: '/servers/view'
       path: '/servers/view'
@@ -125,7 +112,6 @@ export const routeTree = rootRoute.addChildren({
   ConfigurationRoute,
   TargetsRoute,
   ListenersViewRoute,
-  ServersCreateRoute,
   ServersViewRoute,
 })
 
@@ -142,7 +128,6 @@ export const routeTree = rootRoute.addChildren({
         "/configuration",
         "/targets",
         "/listeners/view",
-        "/servers/create",
         "/servers/view"
       ]
     },
@@ -160,9 +145,6 @@ export const routeTree = rootRoute.addChildren({
     },
     "/listeners/view": {
       "filePath": "listeners.view.tsx"
-    },
-    "/servers/create": {
-      "filePath": "servers.create.tsx"
     },
     "/servers/view": {
       "filePath": "servers.view.tsx"
