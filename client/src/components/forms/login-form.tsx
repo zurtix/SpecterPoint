@@ -16,9 +16,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { useToast } from "@/components/ui/use-toast"
 import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
 import { HelpCircle } from "lucide-react"
+import { invoke } from '@tauri-apps/api/tauri'
 
 const loginSchema = z.object({
   username: z.string().min(6),
@@ -28,18 +30,26 @@ const loginSchema = z.object({
 
 export default function LoginForm() {
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const { toast } = useToast()
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
   })
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
-    // TODO: Submit invoke to backend client tauri app to perform lookup in sqlite
-    console.log(values)
-    navigate({
-      to: '/targets'
-    })
+    console.log(values);
+    invoke("login", values).then((_) =>
+      navigate({
+        to: "/targets"
+      })
+    ).catch((err: string) =>
+      toast({
+        variant: "destructive",
+        title: err,
+        description: "Review username, password, and encryption key",
+      })
+    )
   }
 
   return (
