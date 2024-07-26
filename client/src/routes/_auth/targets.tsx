@@ -5,7 +5,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 
-export const Route = createFileRoute('/targets')({
+export const Route = createFileRoute('/_auth/targets')({
   component: () =>
     <ResizablePanelGroup
       direction="horizontal"
