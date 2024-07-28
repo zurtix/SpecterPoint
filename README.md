@@ -44,10 +44,10 @@ By accessing, using, or participating in the SpecterPoint project, users agree t
 # Screenshots
 
 ## Login
-![Login screenshot](docs/screenshot/login.png)
+![Login screenshot](docs/screenshot/login.PNG)
 
 ## Menu (under construction)
-![Menu screenshot](docs/screenshot/menu.png)
+![Menu screenshot](docs/screenshot/menu.PNG)
 
 ## Targets (under construction)
-![Targets screenshot](docs/screenshot/targets.png)
+![Targets screenshot](docs/screenshot/targets.PNG)
