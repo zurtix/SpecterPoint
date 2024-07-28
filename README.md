@@ -40,3 +40,14 @@ The developers of SpecterPoint hereby declare that they are not responsible for 
 Users of SpecterPoint are expected to adhere to all applicable laws, regulations, and ethical guidelines governing the use of cybersecurity tools and techniques. The developers shall not be held liable for any misuse, illegal activities, or damages arising from the misuse of the information or tools provided within the scope of SpecterPoint.
 
 By accessing, using, or participating in the SpecterPoint project, users agree to assume all risks and responsibilities associated with their actions and acknowledge that the developers bear no liability for any consequences thereof. It is the sole responsibility of users to ensure that their activities are conducted in a legal, ethical, and responsible manner.
+
+# Screenshots
+
+## Login
+![Login screenshot](docs/screenshot/login.png)
+
+## Menu (under construction)
+![Menu screenshot](docs/screenshot/menu.png)
+
+## Targets (under construction)
+![Targets screenshot](docs/screenshot/targets.png)
