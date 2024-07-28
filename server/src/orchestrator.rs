@@ -1,6 +1,7 @@
-use crate::models::listener::{CreateListener, HttpListener, HttpsListener, TcpListener};
-use crate::models::listener::{Listener, ListenerTypes};
+use crate::models::listener::Listener;
+use crate::models::listener::{HttpListener, HttpsListener, TcpListener};
 use axum::extract::FromRef;
+use common::models::listener::{CreateListener, ListenerTypes};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::oneshot::Sender;

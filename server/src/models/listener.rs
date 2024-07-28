@@ -1,29 +1,7 @@
 use axum::{async_trait, routing::get, Router};
 use axum_server::Handle;
 use serde::{Deserialize, Serialize};
-use serde_json::to_string;
-use std::{net::SocketAddr, str::FromStr};
-use tokio::{
-    sync::oneshot::{Receiver, Sender},
-    task::JoinHandle,
-};
-use tracing::debug;
-
-#[derive(Serialize, Deserialize)]
-pub enum ListenerTypes {
-    Http,
-    Https,
-    Tcp,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct CreateListener {
-    pub name: String,
-    pub host: String,
-    pub port: u16,
-    pub r#type: ListenerTypes,
-    pub endpoints: Option<Vec<String>>,
-}
+use std::net::SocketAddr;
 
 #[async_trait]
 pub trait Listener {

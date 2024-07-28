@@ -8,8 +8,10 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import LoginForm from '@/components/forms/login-form'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import SetupForm from '@/components/forms/setup-form'
+import { invoke } from '@tauri-apps/api/tauri'
+import { useToast } from "@/components/ui/use-toast"
 
 export const Route = createLazyFileRoute('/')({
   component: () => (
@@ -19,8 +21,20 @@ export const Route = createLazyFileRoute('/')({
 
 function Index() {
 
-  const firstLaunch: boolean = false; // TODO: Obtain if first launched from the database backend clientside
+  const { toast } = useToast()
+  const [setupRequired, setSetupRequired] = useState(false);
   const [image, setImage] = useState(ghosty);
+
+  useEffect(() => {
+    invoke<boolean>("is_setup_required")
+      .then((setup: boolean) => setSetupRequired(setup))
+      .catch((err: string) => toast({
+        variant: "destructive",
+        title: err,
+      })
+      )
+  }, [setupRequired])
+
 
   return (
     <div>
@@ -29,7 +43,7 @@ function Index() {
           <div className="h-[75px] mt-10" onMouseEnter={() => setImage(poof)} onMouseLeave={() => setImage(ghosty)}>
             <img src={image} width={100} className="opacity-20 m-auto" />
           </div>
-          {firstLaunch ?
+          {setupRequired ?
             (
               <div>
                 <CardHeader>

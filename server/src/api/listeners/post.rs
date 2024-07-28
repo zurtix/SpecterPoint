@@ -1,8 +1,8 @@
 use crate::error::Result;
-use crate::models::listener::CreateListener;
 use crate::models::state::AppState;
 use axum::extract::Path;
 use axum::{extract::State, response::IntoResponse, Json};
+use common::models::listener::CreateListener;
 use tracing::debug;
 
 pub async fn create_listener(

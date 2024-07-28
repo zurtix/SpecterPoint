@@ -28,6 +28,7 @@ import { useState } from 'react'
 import ListenerForm from '@/components/forms/listener-form'
 import ManualServerForm from '@/components/forms/manual-server-form'
 import AwsServerForm from '@/components/forms/aws-server.form'
+import { invoke } from '@tauri-apps/api/tauri'
 
 export const Route = createFileRoute('/_auth')({
   component: () => (
@@ -152,7 +153,7 @@ function Navigation() {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <span>Quit</span>
+              <span onClick={() => invoke("quit")}>Quit</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -19,6 +19,8 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
 import { HelpCircle } from "lucide-react"
+import { invoke } from '@tauri-apps/api/tauri'
+import { useToast } from '@/components/ui/use-toast'
 
 const signupSchema = z.object({
   username: z.string().min(6),
@@ -46,6 +48,7 @@ const signupSchema = z.object({
 export default function SetupForm() {
 
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
@@ -53,6 +56,17 @@ export default function SetupForm() {
 
   function onSubmit(values: z.infer<typeof signupSchema>) {
     // TODO: Register the setup via invoke tauri app to sqlite
+    invoke("create_user", values)
+      .then((_) => navigate({ to: '/targets' }))
+      .catch((err) =>
+        toast({
+          variant: "destructive",
+          title: err,
+          description: "Review username, password, and encryption key",
+        })
+
+      )
+
     console.log(values)
     navigate({
       to: '/'
@@ -142,7 +156,7 @@ export default function SetupForm() {
 
           </div>
           <div className="flex gap-2 mt-4">
-            <Button type="submit">Login</Button>
+            <Button type="submit">Complete Setup</Button>
           </div>
         </form>
       </Form>
