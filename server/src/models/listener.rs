@@ -1,22 +1,22 @@
 use axum::{async_trait, routing::get, Router};
 use axum_server::Handle;
-use serde::{Deserialize, Serialize};
+use common::models::endpoint::Endpoint;
 use std::net::SocketAddr;
 
 #[async_trait]
-pub trait Listener {
+pub trait Listen {
     async fn start(&mut self);
     async fn stop(&mut self);
 }
 
 pub struct HttpListener {
     addr: SocketAddr,
-    endpoints: Option<Vec<String>>,
+    endpoints: Vec<Endpoint>,
     handle: Handle,
 }
 
 impl HttpListener {
-    pub async fn new(host: String, port: u16, endpoints: Option<Vec<String>>) -> Self {
+    pub async fn new(host: String, port: u16, endpoints: Vec<Endpoint>) -> Self {
         let addr: SocketAddr = format!("{}:{}", host, port).parse().unwrap();
         Self {
             addr,
@@ -27,7 +27,7 @@ impl HttpListener {
 }
 
 #[async_trait]
-impl Listener for HttpListener {
+impl Listen for HttpListener {
     async fn start(&mut self) {
         let app = Router::new().route("/", get(crate::handlers::get::handle_temp));
 
@@ -58,7 +58,7 @@ impl HttpsListener {
 }
 
 #[async_trait]
-impl Listener for HttpsListener {
+impl Listen for HttpsListener {
     async fn start(&mut self) {
         !unimplemented!()
     }
@@ -77,7 +77,7 @@ impl TcpListener {
 }
 
 #[async_trait]
-impl Listener for TcpListener {
+impl Listen for TcpListener {
     async fn start(&mut self) {
         !unimplemented!()
     }

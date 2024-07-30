@@ -11,8 +11,8 @@ pub mod post;
 
 pub fn routes() -> Router<AppState> {
     Router::new()
-        .route("/", get(get::get_listeners).post(post::create_listener))
-        .route("/:name/start", post(post::start_listener))
-        .route("/:name/stop", post(post::stop_listener))
-        .route("/:name", delete(delete::delete_listener))
+        .route("/", get(get::get_listeners).post(post::add_listener))
+        .route("/:id/start", post(post::start_listener))
+        .route("/:id/stop", post(post::stop_listener))
+        .route("/:id", delete(delete::delete_listener))
 }

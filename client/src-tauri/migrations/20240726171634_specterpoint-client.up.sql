@@ -13,12 +13,9 @@ CREATE TABLE IF NOT EXISTS listeners (
     "type" TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS endpoint_junction (
-    listener_id INTEGER NOT NULL,
-    endpoint_id INTEGER NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS endpoints (
     id INTEGER PRIMARY KEY,
-    endpoint TEXT NOT NULL
+    listener_id INTEGER NOT NULL,
+    endpoint TEXT NOT NULL,
+    FOREIGN KEY (listener_id) REFERENCES listeners (id)
 );

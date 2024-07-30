@@ -153,7 +153,7 @@ function Navigation() {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <span onClick={() => invoke("quit")}>Quit</span>
+              <span className="w-full" onClick={() => invoke("quit")}>Quit</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

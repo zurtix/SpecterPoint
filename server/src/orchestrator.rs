@@ -1,65 +1,53 @@
-use crate::models::listener::Listener;
+use crate::db::listener::get_listener;
+use crate::models::listener::Listen;
 use crate::models::listener::{HttpListener, HttpsListener, TcpListener};
 use axum::extract::FromRef;
-use common::models::listener::{CreateListener, ListenerTypes};
+use common::models::listener::ListenerTypes;
+use sqlx::SqlitePool;
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::oneshot::Sender;
 use tokio::sync::Mutex;
-use tracing::debug;
 
-#[derive(Clone, FromRef, Default)]
+#[derive(Clone, FromRef)]
 pub struct Orchestrator {
-    listeners: Arc<Mutex<HashMap<String, Box<dyn Listener + Send>>>>,
-    running: Arc<Mutex<HashMap<String, Sender<()>>>>,
+    running: Arc<Mutex<HashMap<i64, Box<dyn Listen + Send>>>>,
+    pool: SqlitePool,
 }
 
 impl Orchestrator {
-    pub fn new() -> Self {
+    pub fn new(pool: SqlitePool) -> Self {
         Orchestrator {
-            listeners: Arc::new(Mutex::new(HashMap::new())),
             running: Arc::new(Mutex::new(HashMap::new())),
+            pool,
         }
     }
-    pub async fn add_listener(&self, create: CreateListener) {
-        let listener: Box<dyn Listener + Send> = match create.r#type {
-            ListenerTypes::Http => {
-                Box::new(HttpListener::new(create.host, create.port, create.endpoints).await)
-                    as Box<dyn Listener + Send>
-            }
-            ListenerTypes::Https => Box::new(HttpsListener::new()) as Box<dyn Listener + Send>,
-            ListenerTypes::Tcp => Box::new(TcpListener::new()) as Box<dyn Listener + Send>,
+
+    pub async fn start_listener(self, id: &i64) {
+        let lstn = get_listener(self.pool, id).await;
+        let listener: Box<dyn Listen + Send> = match lstn.listener.r#type {
+            ListenerTypes::Http => Box::new(
+                HttpListener::new(lstn.listener.host, lstn.listener.port, lstn.endpoints).await,
+            ) as Box<dyn Listen + Send>,
+            ListenerTypes::Https => Box::new(HttpsListener::new()) as Box<dyn Listen + Send>,
+            ListenerTypes::Tcp => Box::new(TcpListener::new()) as Box<dyn Listen + Send>,
         };
-        let mut listeners = self.listeners.lock().await;
+        let mut running = self.running.lock().await;
 
-        listeners.entry(create.name).or_insert(listener);
+        running.entry(lstn.listener.id).or_insert(listener);
 
-        debug!("Successfully added new listener.");
-    }
-
-    pub async fn remove_listener(&self, name: &str) {
-        let mut listeners = self.listeners.lock().await;
-        self.stop_listener(name).await;
-        match listeners.remove(name) {
-            Some(_) => debug!("Successfully removed listener {}", name),
-            None => debug!("Failed to remove listener {}", name),
-        };
-    }
-
-    pub async fn start_listener(&self, name: &str) {
-        let mut listeners = self.listeners.lock().await;
-        if let Some(listener) = listeners.get_mut(name) {
+        if let Some(listener) = running.get_mut(id) {
             listener.start().await;
         }
     }
-    pub async fn stop_listener(&self, name: &str) {
-        let mut listeners = self.listeners.lock().await;
-        if let Some(listener) = listeners.get_mut(name) {
+
+    pub async fn stop_listener(&self, id: &i64) {
+        let mut listeners = self.running.lock().await;
+        if let Some(listener) = listeners.get_mut(id) {
             listener.stop().await;
         }
     }
 
-    pub async fn exists(&self, name: &str) -> bool {
-        (*(self.listeners.lock().await)).contains_key(name)
+    pub async fn is_running(&self, id: &i64) -> bool {
+        (*(self.running.lock().await)).contains_key(id)
     }
 }

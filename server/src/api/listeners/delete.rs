@@ -6,9 +6,9 @@ use tracing::debug;
 
 pub async fn delete_listener(
     State(state): State<AppState>,
-    Path(name): Path<String>,
+    Path(id): Path<i64>,
 ) -> Result<impl IntoResponse> {
     debug!("Deleting listener.");
-    state.orch.remove_listener(&name).await;
+    crate::db::listener::delete_listener(state.pool, &id).await;
     Ok(Json(""))
 }

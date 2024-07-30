@@ -55,7 +55,6 @@ export default function SetupForm() {
   })
 
   function onSubmit(values: z.infer<typeof signupSchema>) {
-    // TODO: Register the setup via invoke tauri app to sqlite
     invoke("create_user", values)
       .then((_) => navigate({ to: '/targets' }))
       .catch((err) =>
@@ -66,11 +65,6 @@ export default function SetupForm() {
         })
 
       )
-
-    console.log(values)
-    navigate({
-      to: '/'
-    })
   }
 
   return (

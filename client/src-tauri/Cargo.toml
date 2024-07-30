@@ -16,8 +16,9 @@ serde_json.workspace = true
 common.workspace = true
 tokio.workspace = true
 sqlx.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
 tauri = { version = "1", features = ["shell-open"] }
-tracing = "0.1.40"
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

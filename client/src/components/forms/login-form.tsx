@@ -38,7 +38,6 @@ export default function LoginForm() {
   })
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
-    console.log(values);
     invoke("login", values).then((_) =>
       navigate({
         to: "/targets"

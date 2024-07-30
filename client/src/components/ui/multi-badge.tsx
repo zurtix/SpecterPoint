@@ -71,7 +71,7 @@ export const MultiBadge = React.forwardRef<
     }
 
     function handleClick() {
-      if (!selectedValues.includes(newValue)) {
+      if (newValue && !selectedValues.includes(newValue)) {
         setSelectedValues([...selectedValues, newValue]);
         onValueChange(selectedValues);
       }

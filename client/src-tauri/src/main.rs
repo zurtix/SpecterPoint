@@ -3,13 +3,16 @@
 
 pub mod handlers;
 pub mod models;
-pub mod sqlite;
+
+use common::db::sqlite;
+
+const DB_URL: &str = "sqlite://specterpoint-client.db";
 
 #[tokio::main]
 async fn main() {
-    sqlite::init().await;
+    sqlite::init(DB_URL, Some("./migrations")).await;
 
-    let pool = sqlite::connect().await;
+    let pool = sqlite::connect(DB_URL).await;
     let state = models::state::AppState::new(pool).await;
 
     tauri::Builder::default()
