@@ -19,3 +19,11 @@ CREATE TABLE IF NOT EXISTS endpoints (
     endpoint TEXT NOT NULL,
     FOREIGN KEY (listener_id) REFERENCES listeners (id)
 );
+
+CREATE TABLE IF NOT EXISTS servers (
+    id INTEGER PRIMARY KEY,
+    "host" TEXT NOT NULL,
+    port INTEGER NOT NULL,
+    username TEXT NOT NULL,
+    password TEXT NOT NULL
+);

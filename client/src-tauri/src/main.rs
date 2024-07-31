@@ -13,7 +13,7 @@ async fn main() {
     sqlite::init(DB_URL, Some("./migrations")).await;
 
     let pool = sqlite::connect(DB_URL).await;
-    let state = models::state::AppState::new(pool).await;
+    let state = models::state::AppState::new(pool);
 
     tauri::Builder::default()
         .manage(state)

@@ -1,4 +1,6 @@
 use crate::models::{state::AppState, user::User};
+use common::crypt::verify_password_hash;
+use common::error::Error;
 
 #[tauri::command]
 pub async fn login(
@@ -6,7 +8,7 @@ pub async fn login(
     username: &str,
     password: &str,
     _key: &str,
-) -> Result<(), String> {
+) -> Result<(), Error> {
     let user: User = sqlx::query_as(
         r#"
         SELECT username, password, data
@@ -16,12 +18,11 @@ pub async fn login(
     )
     .bind(username)
     .fetch_one(&state.pool)
-    .await
-    .map_err(|_| "Failed authentication")?;
+    .await?;
 
-    if password != user.password {
-        Err("Failed authentication".into())
-    } else {
+    if verify_password_hash(&user.password, password)? {
         Ok(())
+    } else {
+        Err(Error::Backend("Failed authentication".into()))
     }
 }

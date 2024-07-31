@@ -1,4 +1,6 @@
 use crate::models::state::AppState;
+use common::crypt::generate_password_hash;
+use common::error::Error;
 
 #[tauri::command]
 pub async fn create_user(
@@ -6,7 +8,9 @@ pub async fn create_user(
     username: &str,
     password: &str,
     key: &str,
-) -> Result<(), String> {
+) -> Result<(), Error> {
+    let hash = generate_password_hash(password)?;
+
     sqlx::query(
         r#"
         INSERT INTO user (username, password, data)
@@ -14,11 +18,10 @@ pub async fn create_user(
         "#,
     )
     .bind(username)
-    .bind(password)
+    .bind(hash)
     .bind(key)
     .execute(&state.pool)
-    .await
-    .map_err(|_| "Failed to create user")?;
+    .await?;
 
     Ok(())
 }
