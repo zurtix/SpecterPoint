@@ -93,7 +93,7 @@ export default function LoginForm() {
                         <HelpCircle width={15} height={15} />
                       </PopoverTrigger>
                       <PopoverContent>
-                        <p>AES-256 CBC 32-Bit encryption key</p>
+                        <p>AES-256 GCM 32-Bit encryption key</p>
                       </PopoverContent>
                     </Popover>
 
