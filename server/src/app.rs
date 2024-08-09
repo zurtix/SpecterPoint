@@ -1,5 +1,5 @@
 use crate::orchestrator::Orchestrator;
-use crate::{api, models::config::Config};
+use crate::{api, auth, models::config::Config};
 use axum_login::{
     login_required,
     tower_sessions::{ExpiredDeletion, Expiry, SessionManagerLayer},
@@ -58,7 +58,8 @@ impl App {
         let host = format!("{}:{}", &config.host, &config.port);
 
         let app = api::routes(self)
-            .route_layer(login_required!(Backend, login_url = "/login"))
+            .route_layer(login_required!(Backend))
+            .merge(auth::router())
             .layer(auth_layer);
 
         let listener = tokio::net::TcpListener::bind(host)
