@@ -54,11 +54,7 @@ impl AuthnBackend for Backend {
             .fetch_optional(&self.db)
             .await?;
 
-        // Verifying the password is blocking and potentially slow, so we'll do so via
-        // `spawn_blocking`.
         tokio::task::spawn_blocking(|| {
-            // We're using password-based authentication--this works by comparing our form
-            // input with an argon2 password hash.
             Ok(user.filter(|user| {
                 crate::crypt::hash::verify_password_hash(creds.password, &user.password).is_ok()
             }))

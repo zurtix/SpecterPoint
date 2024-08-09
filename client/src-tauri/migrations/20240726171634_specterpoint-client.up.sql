@@ -1,8 +1,8 @@
 -- Add up migration script here
 CREATE TABLE IF NOT EXISTS user (
+    id INTEGER PRIMARY KEY,
     username TEXT NOT NULL,
-    "password" TEXT NOT NULL,
-    "data" TEXT NOT NULL
+    "password" TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS listeners (
