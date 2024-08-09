@@ -1,5 +1,5 @@
 use crate::models::state::AppState;
-use common::crypt::encrypt;
+use common::crypt::aes::encrypt;
 use common::error::Error;
 use common::models::server::ServerBase;
 

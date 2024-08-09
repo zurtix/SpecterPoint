@@ -6,7 +6,12 @@ edition = "2021"
 [dependencies]
 serde.workspace = true
 sqlx.workspace = true
+tracing.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
 argon2 = "0.5.3"
 thiserror = "1.0.63"
 aes-gcm = "0.10.3"
 hex = "0.4.3"
+axum = "0.7.5"
+axum-login = "0.15.3"

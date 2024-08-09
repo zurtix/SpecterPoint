@@ -1,12 +1,14 @@
-use crate::models::state::AppState;
+use crate::app::App;
 use axum::routing::Router;
 
+pub mod auth;
 pub mod listeners;
 
-pub fn app(state: AppState) -> Router {
-    Router::new().nest("/api", routes()).with_state(state)
-}
-
-pub fn routes() -> Router<AppState> {
-    Router::new().nest("/listeners", listeners::routes())
+pub fn routes(state: App) -> Router {
+    Router::new()
+        .nest(
+            "/api",
+            Router::new().nest("/listeners", listeners::routes()),
+        )
+        .with_state(state)
 }
