@@ -9,8 +9,8 @@ pub async fn login(
 ) -> Result<(), Error> {
     let user: User = sqlx::query_as(
         r#"
-        SELECT username, password
-        FROM user
+        SELECT id, username, password
+        FROM users
         WHERE username = ?1
         "#,
     )

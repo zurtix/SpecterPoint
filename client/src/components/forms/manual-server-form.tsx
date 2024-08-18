@@ -20,21 +20,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
-
-const manualServerSchema = z.object({
-  name: z.string(),
-  host: z.string(),
-  port: z.string(),
-  username: z.string(),
-  password: z.string().min(8),
-})
+import { ManualServerSchema, manualServerSchema } from "@/components/forms/schemas"
 
 export default function ManualServerForm() {
-  const form = useForm<z.infer<typeof manualServerSchema>>({
+  const form = useForm<ManualServerSchema>({
     resolver: zodResolver(manualServerSchema),
   })
 
-  function onSubmit(values: z.infer<typeof manualServerSchema>) {
+  function onSubmit(values: ManualServerSchema) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     //

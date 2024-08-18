@@ -12,8 +12,8 @@ pub async fn create_user(
 
     sqlx::query(
         r#"
-        INSERT INTO user (username, password)
-        VALUES (?1, ?2)
+        INSERT INTO users (id, username, password)
+        VALUES (NULL, ?1, ?2)
         "#,
     )
     .bind(username)

@@ -1,14 +1,11 @@
-interface ServerViewProp {
-  server?: number
-}
+import { Server } from "@/components/server/types"
 
-export function ServerView({ server }: ServerViewProp) {
+export function ServerView({ server }: { server?: Server }) {
   return (
-    <div className="w-full p-4">
-      <h1 className="text-xl font-bold mb-4">Non-Scrollable Content</h1>
-      {server !== undefined ? (<div>{server}</div>) : (<div></div>)}
-      <p>This content does not scroll.</p>
-    </div>
+    (server &&
+      <div className="w-full p-4">
+        <p>{server.id}</p>
+      </div>)
 
   )
 }

@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
-import { Key } from "react"
 
 interface ServerItemProps {
   id: number,
@@ -18,7 +17,7 @@ export function ServerItem({ id, name, running, down, type, onClick }: ServerIte
       className={cn(
         "flex flex-col w-full items-start gap-2 p-2 text-left text-sm transition-all hover:bg-accent",
       )}
-      onClick={() => onclick}
+      onClick={() => onClick && onClick()}
     >
       <div className="flex w-full flex-col gap-1">
         <div className="flex items-center w-full">

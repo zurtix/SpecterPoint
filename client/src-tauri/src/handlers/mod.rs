@@ -13,7 +13,7 @@ pub fn make_handlers() -> impl Fn(tauri::Invoke<tauri::Wry>) {
 pub async fn is_setup_required(state: tauri::State<'_, AppState>) -> Result<bool, String> {
     let count: i64 = sqlx::query_scalar(
         r#"
-        SELECT COUNT(*) FROM user
+        SELECT COUNT(*) FROM users
         "#,
     )
     .fetch_one(&state.pool)
