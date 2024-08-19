@@ -12,7 +12,8 @@ import { ResponsiveDialog } from "@/components/ui/responsive-dialog"
 import { ManualServer } from "@/components/server/form-manual"
 import { AwsServer } from "@/components/server/form-aws"
 
-export function CreateServer({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
+export function CreateServer({ open, setOpen }:
+  { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
   return (
     <ResponsiveDialog
       isOpen={open}
@@ -21,7 +22,7 @@ export function CreateServer({ open, setOpen }: { open: boolean, setOpen: React.
       description="Select an option to deploy your server, fill out required criteria"
     >
       <Tabs defaultValue="manual">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-5 mb-4">
           <TabsTrigger value="manual">Manual</TabsTrigger>
           <TabsTrigger value="aws" className="gap-2">
             <img src={aws} height={20} width={20} className='bg-white rounded ronded-lg' />
@@ -44,7 +45,7 @@ export function CreateServer({ open, setOpen }: { open: boolean, setOpen: React.
           <ManualServer setOpen={setOpen} />
         </TabsContent>
         <TabsContent value="aws">
-          <AwsServer />
+          <AwsServer setOpen={setOpen} />
         </TabsContent>
         <TabsContent value="azure">
         </TabsContent>

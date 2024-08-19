@@ -22,7 +22,9 @@ CREATE TABLE IF NOT EXISTS endpoints (
 
 CREATE TABLE IF NOT EXISTS servers (
     id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
     "host" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
     port INTEGER NOT NULL,
     username TEXT NOT NULL,
     password TEXT NOT NULL

@@ -6,7 +6,14 @@ pub mod user;
 use crate::models::state::AppState;
 
 pub fn make_handlers() -> impl Fn(tauri::Invoke<tauri::Wry>) {
-    tauri::generate_handler![is_setup_required, login::login, user::create_user, quit]
+    tauri::generate_handler![
+        is_setup_required,
+        server::add_server,
+        server::all_servers,
+        login::login,
+        user::create_user,
+        quit
+    ]
 }
 
 #[tauri::command]

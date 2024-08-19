@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(sqlx::FromRow, Debug, Serialize, Deserialize)]
 pub struct ServerBase {
     pub name: String,
+    pub r#type: String,
     pub host: String,
     pub port: u16,
     pub username: String,
@@ -13,5 +14,6 @@ pub struct ServerBase {
 pub struct Server {
     pub id: i64,
     #[serde(flatten)]
+    #[sqlx(flatten)]
     pub server: ServerBase,
 }

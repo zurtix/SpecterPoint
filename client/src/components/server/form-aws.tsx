@@ -1,19 +1,10 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm } from "@tanstack/react-form"
+import { zodValidator } from "@tanstack/zod-form-adapter"
 import { z } from "zod"
 import { cn } from "@/lib/utils"
-
+import { FormItem } from "@/components/ui/tanstack-form"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
 import {
   Popover,
   PopoverContent,
@@ -62,178 +53,177 @@ const aws_regions = [
   "sa-east-1",
 ]
 
-const awsServerSchema = z.object({
-  endpoint: z.string(),
-  region: z.string(),
-  accessKey: z.string(),
-  accessSecret: z.string(),
-  username: z.string(),
-  password: z.string()
-})
-
-export function AwsServer() {
-  const form = useForm<z.infer<typeof awsServerSchema>>({
-    resolver: zodResolver(awsServerSchema),
+export function AwsServer({ setOpen }:
+  { setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
+  const form = useForm({
+    defaultValues: {
+      endpoint: "",
+      region: "",
+      accessKey: "",
+      accessSecret: "",
+      username: "",
+      password: ""
+    },
+    onSubmit: async ({ value }) => {
+      console.log(value)
+    },
+    validatorAdapter: zodValidator()
   })
 
-  function onSubmit(values: z.infer<typeof awsServerSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
-  }
-
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-2 justify-between gap-4">
-          <FormField
-            control={form.control}
-            name="endpoint"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Endpoint</FormLabel>
-                <FormDescription>
-                  AWS Endpoint
-                </FormDescription>
-                <FormControl>
-                  <Input placeholder="amazonaws.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="region"
-            render={({ field }) => (
-              <FormItem className="flex flex-col mt-2">
-                <FormLabel>Region</FormLabel>
-                <FormDescription>
-                  Geographical region of your subscription
-                </FormDescription>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                          "w-[200px] justify-between",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value
-                          ? aws_regions.find(
-                            (region) => region === field.value
-                          )
-                          : "Select region"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Search region..." />
-                      <CommandList>
-                        <CommandEmpty>No region found</CommandEmpty>
-                        <CommandGroup>
-                          {aws_regions.map((region) => (
-                            <CommandItem
-                              style={{ pointerEvents: "auto" }}
-                              value={region}
-                              key={region}
-                              onSelect={() => {
-                                form.setValue("region", region)
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  region === field.value
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                              {region}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="accessKey"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Access key ID</FormLabel>
-                <FormDescription>
-                  Key ID for remote auth
-                </FormDescription>
-                <FormControl>
-                  <Input type="password" placeholder="******" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="accessSecret"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Secret access key</FormLabel>
-                <FormDescription>
-                  Secret access key for remote auth
-                </FormDescription>
-                <FormControl>
-                  <Input type="password" placeholder="******" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Separator className="col-span-2" />
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Server username</FormLabel>
-                <FormDescription>
-                  Username to configure server for auth
-                </FormDescription>
-                <FormControl>
-                  <Input type="text" placeholder="ghosty" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Server password</FormLabel>
-                <FormDescription>
-                  Password to configure server for auth
-                </FormDescription>
-                <FormControl>
-                  <Input type="password" placeholder="******" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-        </div>
-        <div className="flex gap-2 mt-4">
+    <form onSubmit={(e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      form.handleSubmit()
+    }}>
+      <div className="grid grid-cols-2 justify-between gap-4">
+        <form.Field
+          name="endpoint"
+          validators={{
+            onChangeAsync: z.string().min(1, "Endpoint required"),
+            onChangeAsyncDebounceMs: 500
+          }}
+          children={(field) => (
+            <FormItem field={field} description="AWS Endpoint">
+              <Input
+                placeholder="amazonaws.com"
+                id={field.name}
+                name={field.name}
+                onChange={(e) => field.handleChange(e.target.value)}
+              />
+            </FormItem>
+          )}
+        />
+        <form.Field
+          name="region"
+          children={(field) => (
+            <FormItem field={field} description="AWS Geo region">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className={cn(
+                      "w-[200px] justify-between",
+                      !field.state.value && "text-muted-foreground"
+                    )}
+                  >
+                    {field.state.value
+                      ? aws_regions.find(
+                        (region) => region === field.state.value
+                      )
+                      : "Select region"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search region..." />
+                    <CommandList>
+                      <CommandEmpty>No region found</CommandEmpty>
+                      <CommandGroup>
+                        {aws_regions.map((region) => (
+                          <CommandItem
+                            style={{ pointerEvents: "auto" }}
+                            value={region}
+                            key={region}
+                            onSelect={() => field.handleChange(region)}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                region === field.state.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {region}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </FormItem>
+          )}
+        />
+        <form.Field
+          name="accessKey"
+          validators={{
+            onChangeAsync: z.string().min(1, "Access key is required"),
+            onChangeAsyncDebounceMs: 500
+          }}
+          children={(field) => (
+            <FormItem field={field} label="Access Key" description="Key ID for AWS">
+              <Input
+                type="password"
+                placeholder="******"
+                id={field.name}
+                name={field.name}
+                onChange={(e) => field.handleChange(e.target.value)}
+              />
+            </FormItem>
+          )}
+        />
+        <form.Field
+          name="accessSecret"
+          validators={{
+            onChangeAsync: z.string().min(1, "Access secret is required"),
+            onChangeAsyncDebounceMs: 500
+          }}
+          children={(field) => (
+            <FormItem field={field} label="Access Secret" description="Secret access key for AWS">
+              <Input
+                type="password"
+                placeholder="******"
+                id={field.name}
+                name={field.name}
+                onChange={(e) => field.handleChange(e.target.value)}
+              />
+            </FormItem>
+          )}
+        />
+        <Separator className="col-span-2" />
+        <form.Field
+          name="username"
+          validators={{
+            onChangeAsync: z.string().min(1, "Username is required"),
+            onChangeAsyncDebounceMs: 500
+          }}
+          children={(field) => (
+            <FormItem field={field} label="New server username" description="New username to configure server for auth">
+              <Input
+                type="text"
+                placeholder="ghosty"
+                id={field.name}
+                name={field.name}
+                onChange={(e) => field.handleChange(e.target.value)}
+              />
+            </FormItem>
+          )}
+        />
+        <form.Field
+          name="password"
+          validators={{
+            onChangeAsync: z.string().min(1, "Password is reqiured"),
+            onChangeAsyncDebounceMs: 500
+          }}
+          children={(field) => (
+            <FormItem field={field} label="New server password" description="New password to configure server for auth">
+              <Input
+                type="password"
+                placeholder="******"
+                id={field.name}
+                name={field.name}
+                onChange={(e) => field.handleChange(e.target.value)}
+              />
+            </FormItem>
+          )}
+        />
+      </div>
+      <div className="flex gap-2 mt-4 justify-between">
+        <div className="flex gap-2">
           <Button type="submit">Connect</Button>
           <Popover>
             <PopoverTrigger asChild>
@@ -244,7 +234,8 @@ export function AwsServer() {
             </PopoverContent>
           </Popover>
         </div>
-      </form>
-    </Form >
+        <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+      </div>
+    </form>
   )
 }

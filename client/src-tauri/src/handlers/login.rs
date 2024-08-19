@@ -6,6 +6,7 @@ pub async fn login(
     state: tauri::State<'_, AppState>,
     username: &str,
     password: &str,
+    key: &str,
 ) -> Result<(), Error> {
     let user: User = sqlx::query_as(
         r#"
@@ -19,6 +20,7 @@ pub async fn login(
     .await?;
 
     if verify_password_hash(user.password, password)? {
+        state.set_key(key.to_string());
         Ok(())
     } else {
         Err(Error::Auth)

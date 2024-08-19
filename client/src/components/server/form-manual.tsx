@@ -9,18 +9,35 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
+import { invoke } from "@tauri-apps/api/tauri"
+import { useToast } from "@/components/ui/use-toast"
 
 export function ManualServer({ setOpen }: { setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
+  const { toast } = useToast()
   const form = useForm({
     defaultValues: {
       name: "",
       host: "",
       port: 0,
       username: "",
-      password: ""
+      password: "",
+      type: "manual"
     },
     onSubmit: async ({ value }) => {
-      console.log(value)
+      invoke("add_server", { server: value }).then((_) => {
+        setOpen(false)
+        toast({
+          variant: "default",
+          title: "Successfully added server",
+          description: `${value.name} was successfully added`,
+        })
+      }).catch((err) => (
+        toast({
+          variant: "destructive",
+          title: "Failed to add server",
+          description: err,
+        })
+      ))
     },
     validatorAdapter: zodValidator()
   })

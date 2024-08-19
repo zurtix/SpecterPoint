@@ -10,49 +10,22 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import { Server } from "@/components/server/types"
-
-const server_stub = [
-  {
-    id: 0,
-    name: "server 0",
-    running: 5,
-    down: 2,
-    type: "Manual"
-  },
-  {
-    id: 1,
-    name: "server 1",
-    running: 5,
-    down: 2,
-    type: "Manual"
-  },
-  {
-    id: 2,
-    name: "server 2",
-    running: 5,
-    down: 2,
-    type: "Manual"
-  },
-  {
-    id: 3,
-    name: "server 3",
-    running: 5,
-    down: 2,
-    type: "Manual"
-  }
-]
+import { invoke } from "@tauri-apps/api/tauri"
 
 export function Servers() {
   const [server, setServer] = useState<Server>();
   const [servers, setServers] = useState<Server[]>()
 
-  function handleSearch(val: string) {
-    setServers(server_stub.filter(s => s.name.includes(val)))
-  }
-
   useEffect(() => {
-    setServers(server_stub)
+    invoke<Server[]>("all_servers").then((srvs) => (
+      setServers(srvs)
+    ))
   }, [])
+
+
+  function handleSearch(val: string) {
+    setServers(servers!.filter(s => s.name.includes(val)))
+  }
 
   return (
     <ResizablePanelGroup direction="horizontal">
@@ -68,6 +41,7 @@ export function Servers() {
             <ScrollArea className="w-full">          {
               servers?.map((s) => (
                 <ServerItem
+                  key={s.id}
                   onClick={() => setServer(s)}
                   {...s}
                 />

@@ -33,7 +33,7 @@ export function ServerItem({ id, name, running, down, type, onClick }: ServerIte
         <Badge className="bg-red-500">
           {down ? (down) : ("?")}
         </Badge>
-        <Badge className="bg-muted text-gray-500">
+        <Badge className="bg-muted text-gray-500 capitalize">
           {type}
         </Badge>
       </div>
