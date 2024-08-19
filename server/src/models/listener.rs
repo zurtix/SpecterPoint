@@ -29,11 +29,15 @@ impl HttpListener {
 #[async_trait]
 impl Listen for HttpListener {
     async fn start(&mut self) {
-        let app = Router::new().route("/", get(crate::handlers::get::handle_temp));
+        let mut app = Router::new();
+
+        for e in self.endpoints.iter() {
+            app = app.route(&e.endpoint, get(crate::handlers::get::handle_get_http));
+        }
 
         let addr = self.addr;
-
         let handle = self.handle.clone();
+
         tokio::spawn(async move {
             axum_server::bind(addr)
                 .handle(handle)

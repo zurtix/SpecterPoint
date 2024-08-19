@@ -2,9 +2,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useForm } from "@tanstack/react-form"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
-import {
-  FormItem
-} from "@/components/ui/tanstack-form"
+import { FormItem } from "@/components/ui/tanstack-form"
 import { useToast } from "@/components/ui/use-toast"
 import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
@@ -25,10 +23,10 @@ export default function LoginForm() {
         navigate({
           to: "/targets"
         })
-      ).catch((err: string) =>
+      ).catch(() =>
         toast({
           variant: "destructive",
-          title: err,
+          title: "Failed to login",
           description: "Review username, password, and encryption key",
         })
       )
@@ -47,8 +45,8 @@ export default function LoginForm() {
           <form.Field
             name="username"
             validators={{
-              onChange: z.string().min(3, "Username must be at least 3 character(s)"),
-              onChangeAsyncDebounceMs: 1000,
+              onChangeAsyncDebounceMs: 500,
+              onChangeAsync: z.string().min(3, "Username must be at least 3 character(s)"),
             }}
             children={(field) => (
               <FormItem field={field}>
@@ -63,6 +61,10 @@ export default function LoginForm() {
           />
           <form.Field
             name="password"
+            validators={{
+              onChangeAsyncDebounceMs: 500,
+              onChangeAsync: z.string().min(1, "Password must be supplied"),
+            }}
             children={(field) => (
               <FormItem field={field}>
                 <Input
@@ -78,10 +80,16 @@ export default function LoginForm() {
           <Separator className="mt-2 mb-2" />
           <form.Field
             name="key"
+            validators={{
+              onChangeAsync: z.string()
+                .min(32, "Key must be a minimum of 32 character(s)")
+                .max(32, "Key must be a maximum of 32 character(s)"),
+              onChangeAsyncDebounceMs: 800
+            }}
             children={(field) => (
-              <FormItem label="Encryption Key" field={field}>
+              <FormItem label="Encryption Key" description="AES-256 GCM 32-Bit encryption key" field={field}>
                 <Input
-                  placeholder="******"
+                  placeholder="********************************"
                   type="password"
                   id={field.name}
                   name={field.name}

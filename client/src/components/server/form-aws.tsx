@@ -1,5 +1,3 @@
-"use client"
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -73,7 +71,7 @@ const awsServerSchema = z.object({
   password: z.string()
 })
 
-export default function AwsServerForm() {
+export function AwsServer() {
   const form = useForm<z.infer<typeof awsServerSchema>>({
     resolver: zodResolver(awsServerSchema),
   })

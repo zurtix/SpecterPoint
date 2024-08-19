@@ -84,7 +84,7 @@ export const FormMessage = React.forwardRef<
       {...props}
     >
       {field.state.meta.errors ? (
-        <em className="text-xs text-red-700" role="alert">{field.state.meta.errors.join(', ')}</em>
+        <em className="text-xs text-destructive" role="alert">{field.state.meta.errors.join(', ')}</em>
       ) : null}
     </p>
   )

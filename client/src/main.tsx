@@ -2,7 +2,7 @@ import "./globals.css";
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
-import { ThemeProvider } from "@/components/theme/theme-provider"
+import { ThemeProvider } from "@/components/provider/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 
 // Import the generated route tree

@@ -1,9 +1,5 @@
 import { Link } from "@tanstack/react-router"
 import ghosty from '@/assets/ghosty.gif'
-import aws from "@/assets/aws.png"
-import azure from "@/assets/azure.png"
-import digitalocean from "@/assets/digitalocean.png"
-import google from "@/assets/google.png"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -17,17 +13,10 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
 import { ResponsiveDialog } from '@/components/ui/responsive-dialog'
 import { useState } from 'react'
-import ListenerForm from '@/components/forms/listener-form'
-import ManualServerForm from '@/components/forms/manual-server-form'
-import AwsServerForm from '@/components/forms/aws-server.form'
+import ListenerForm from '@/components/listener/form-listener'
+import { CreateServer } from "@/components/server/create"
 import { invoke } from '@tauri-apps/api/tauri'
 
 export function Navigation() {
@@ -44,47 +33,7 @@ export function Navigation() {
       >
         <ListenerForm />
       </ResponsiveDialog>
-      <ResponsiveDialog
-        isOpen={isCreateServerOpen}
-        setIsOpen={setIsCreateServerOpen}
-        title="Create new Server"
-        description="Select an option to deploy your server, fill out required criteria"
-      >
-        <Tabs defaultValue="manual">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="manual">Manual</TabsTrigger>
-            <TabsTrigger value="aws" className="gap-2">
-              <img src={aws} height={20} width={20} className='bg-white rounded ronded-lg' />
-              AWS
-            </TabsTrigger>
-            <TabsTrigger value="azure" className="gap-2">
-              <img src={azure} height={20} width={20} className='bg-white rounded ronded-lg' />
-              Azure
-            </TabsTrigger>
-            <TabsTrigger value="digitalocean" className="gap-2">
-              <img src={digitalocean} height={20} width={20} className='bg-white rounded ronded-lg' />
-              Digital Ocean
-            </TabsTrigger>
-            <TabsTrigger value="gcp" className="gap-2">
-              <img src={google} height={20} width={20} className='bg-white rounded ronded-lg' />
-              Google
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="manual">
-            <ManualServerForm />
-          </TabsContent>
-          <TabsContent value="aws">
-            <AwsServerForm />
-          </TabsContent>
-          <TabsContent value="azure">
-          </TabsContent>
-          <TabsContent value="digitalocean">
-          </TabsContent>
-          <TabsContent value="gcp">
-          </TabsContent>
-        </Tabs>
-      </ResponsiveDialog>
-
+      <CreateServer open={isCreateServerOpen} setOpen={setIsCreateServerOpen} />
       <div className="z-70 p-2 fixed bottom-0 left-0 w-full">
         <hr className='mb-1' />
         <DropdownMenu>
@@ -150,6 +99,6 @@ export function Navigation() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
+    </div >
   )
 }

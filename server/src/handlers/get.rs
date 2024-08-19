@@ -1,3 +1,3 @@
-pub async fn handle_temp() -> &'static str {
+pub async fn handle_get_http() -> &'static str {
     "Hello, world!"
 }

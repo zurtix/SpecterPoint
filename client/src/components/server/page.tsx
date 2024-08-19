@@ -42,7 +42,7 @@ const server_stub = [
   }
 ]
 
-export function ServerPage() {
+export function Servers() {
   const [server, setServer] = useState<Server>();
   const [servers, setServers] = useState<Server[]>()
 
