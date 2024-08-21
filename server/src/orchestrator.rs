@@ -36,14 +36,14 @@ impl Orchestrator {
         running.entry(lstn.listener.id).or_insert(listener);
 
         if let Some(listener) = running.get_mut(id) {
-            listener.start().await;
+            listener.start();
         }
     }
 
     pub async fn stop_listener(&self, id: &i64) {
         let mut listeners = self.running.lock().await;
         if let Some(listener) = listeners.get_mut(id) {
-            listener.stop().await;
+            listener.stop();
         }
     }
 

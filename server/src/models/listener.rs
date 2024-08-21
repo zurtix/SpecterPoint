@@ -3,10 +3,9 @@ use axum_server::Handle;
 use common::models::endpoint::Endpoint;
 use std::net::SocketAddr;
 
-#[async_trait]
 pub trait Listen {
-    async fn start(&mut self);
-    async fn stop(&mut self);
+    fn start(&mut self);
+    fn stop(&mut self);
 }
 
 pub struct HttpListener {
@@ -28,7 +27,7 @@ impl HttpListener {
 
 #[async_trait]
 impl Listen for HttpListener {
-    async fn start(&mut self) {
+    fn start(&mut self) {
         let mut app = Router::new();
 
         for e in self.endpoints.iter() {
@@ -47,7 +46,7 @@ impl Listen for HttpListener {
         });
     }
 
-    async fn stop(&mut self) {
+    fn stop(&mut self) {
         self.handle.shutdown();
     }
 }
@@ -63,10 +62,10 @@ impl HttpsListener {
 
 #[async_trait]
 impl Listen for HttpsListener {
-    async fn start(&mut self) {
+    fn start(&mut self) {
         !unimplemented!()
     }
-    async fn stop(&mut self) {
+    fn stop(&mut self) {
         !unimplemented!()
     }
 }
@@ -82,10 +81,10 @@ impl TcpListener {
 
 #[async_trait]
 impl Listen for TcpListener {
-    async fn start(&mut self) {
+    fn start(&mut self) {
         !unimplemented!()
     }
-    async fn stop(&mut self) {
+    fn stop(&mut self) {
         !unimplemented!()
     }
 }
