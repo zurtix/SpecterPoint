@@ -2,7 +2,7 @@ use crate::db::listener::get_listener;
 use crate::models::listener::Listen;
 use crate::models::listener::{HttpListener, HttpsListener, TcpListener};
 use axum::extract::FromRef;
-use common::models::listener::ListenerTypes;
+use common::{error::Result, models::listener::ListenerTypes};
 use sqlx::SqlitePool;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -22,8 +22,9 @@ impl Orchestrator {
         }
     }
 
-    pub async fn start_listener(self, id: &i64) {
-        let lstn = get_listener(self.pool, id).await;
+    pub async fn start_listener(self, id: &i64) -> Result<()> {
+        let lstn = get_listener(self.pool, id).await?;
+
         let listener: Box<dyn Listen + Send> = match lstn.listener.r#type {
             ListenerTypes::Http => Box::new(
                 HttpListener::new(lstn.listener.host, lstn.listener.port, lstn.endpoints).await,
@@ -38,6 +39,8 @@ impl Orchestrator {
         if let Some(listener) = running.get_mut(id) {
             listener.start();
         }
+
+        Ok(())
     }
 
     pub async fn stop_listener(&self, id: &i64) {

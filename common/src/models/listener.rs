@@ -30,3 +30,9 @@ pub struct CreateListener {
     pub listener: ListenerBase,
     pub endpoints: Vec<String>,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ListenerState {
+    pub id: i64,
+    pub running: bool,
+}
