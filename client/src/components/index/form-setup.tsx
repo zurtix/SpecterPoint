@@ -21,13 +21,13 @@ export default function SetupForm() {
       keyConfirm: ""
     },
     onSubmit: async ({ value }) => {
-      invoke("create_user", value)
-        .then((_) => navigate({ to: '/targets' }))
+      invoke("user_create", value)
+        .then(() => navigate({ to: '/targets' }))
         .catch(() =>
           toast({
             variant: "destructive",
             title: "Failed to setup",
-            description: "Review username, password, and encryption key",
+            description: "Unable to create user, please review logs",
           })
         )
     },

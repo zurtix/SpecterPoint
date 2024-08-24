@@ -1,11 +1,13 @@
-use axum::{async_trait, routing::get, Router};
+use crate::handlers;
+use axum::{async_trait, Router};
 use axum_server::Handle;
 use common::models::endpoint::Endpoint;
 use std::net::SocketAddr;
 
+#[async_trait]
 pub trait Listen {
-    fn start(&mut self);
-    fn stop(&mut self);
+    async fn start(&mut self);
+    async fn stop(&mut self);
 }
 
 pub struct HttpListener {
@@ -27,15 +29,14 @@ impl HttpListener {
 
 #[async_trait]
 impl Listen for HttpListener {
-    fn start(&mut self) {
+    async fn start(&mut self) {
         let mut app = Router::new();
-
-        for e in self.endpoints.iter() {
-            app = app.route(&e.endpoint, get(crate::handlers::get::handle_get_http));
-        }
-
         let addr = self.addr;
         let handle = self.handle.clone();
+
+        for e in self.endpoints.iter() {
+            app = app.merge(handlers::routes(&e.endpoint));
+        }
 
         tokio::spawn(async move {
             axum_server::bind(addr)
@@ -46,7 +47,7 @@ impl Listen for HttpListener {
         });
     }
 
-    fn stop(&mut self) {
+    async fn stop(&mut self) {
         self.handle.shutdown();
     }
 }
@@ -62,10 +63,10 @@ impl HttpsListener {
 
 #[async_trait]
 impl Listen for HttpsListener {
-    fn start(&mut self) {
+    async fn start(&mut self) {
         !unimplemented!()
     }
-    fn stop(&mut self) {
+    async fn stop(&mut self) {
         !unimplemented!()
     }
 }
@@ -81,10 +82,10 @@ impl TcpListener {
 
 #[async_trait]
 impl Listen for TcpListener {
-    fn start(&mut self) {
+    async fn start(&mut self) {
         !unimplemented!()
     }
-    fn stop(&mut self) {
+    async fn stop(&mut self) {
         !unimplemented!()
     }
 }

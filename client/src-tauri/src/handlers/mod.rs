@@ -11,7 +11,7 @@ pub fn make_handlers() -> impl Fn(tauri::Invoke<tauri::Wry>) {
         server::add_server,
         server::all_servers,
         login::login,
-        user::create_user,
+        user::user_create,
         quit
     ]
 }

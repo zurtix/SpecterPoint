@@ -1,26 +1,19 @@
 use crate::models::state::AppState;
-use common::{crypt::hash::verify_password_hash, error::Error, models::user::User};
+use common::{
+    crypt::hash::verify_password_hash,
+    db::user::get_user,
+    error::Error,
+    models::user::{Credentials, User},
+};
 
 #[tauri::command]
-pub async fn login(
-    state: tauri::State<'_, AppState>,
-    username: &str,
-    password: &str,
-    key: &str,
-) -> Result<(), Error> {
-    let user: User = sqlx::query_as(
-        r#"
-        SELECT id, username, password
-        FROM users
-        WHERE username = ?1
-        "#,
-    )
-    .bind(username)
-    .fetch_one(&state.pool)
-    .await?;
+pub async fn login(state: tauri::State<'_, AppState>, creds: Credentials) -> Result<(), Error> {
+    let user: User = get_user(state.pool.clone(), &creds.username).await?;
 
-    if verify_password_hash(user.password, password)? {
-        state.set_key(key.to_string());
+    if verify_password_hash(user.password, &creds.password)? {
+        if let Some(key) = creds.key {
+            state.set_key(key.to_string());
+        }
         Ok(())
     } else {
         Err(Error::Auth)

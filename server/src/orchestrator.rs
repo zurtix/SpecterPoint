@@ -1,11 +1,10 @@
-use crate::db::listener::get_listener;
 use crate::models::listener::Listen;
 use crate::models::listener::{HttpListener, HttpsListener, TcpListener};
 use axum::extract::FromRef;
+use common::db::listener::get_listener;
 use common::{error::Result, models::listener::ListenerTypes};
 use sqlx::SqlitePool;
-use std::collections::HashMap;
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 use tokio::sync::Mutex;
 
 #[derive(Clone, FromRef)]
@@ -37,7 +36,7 @@ impl Orchestrator {
         running.entry(lstn.listener.id).or_insert(listener);
 
         if let Some(listener) = running.get_mut(id) {
-            listener.start();
+            listener.start().await;
         }
 
         Ok(())
@@ -46,7 +45,7 @@ impl Orchestrator {
     pub async fn stop_listener(&self, id: &i64) {
         let mut listeners = self.running.lock().await;
         if let Some(listener) = listeners.get_mut(id) {
-            listener.stop();
+            listener.stop().await;
         }
     }
 

@@ -1,8 +1,7 @@
 use crate::app::App;
 use axum::extract::Path;
 use axum::{extract::State, response::IntoResponse, Json};
-use common::error::Result;
-use common::models::listener::Listener;
+use common::{error::Result, models::listener::Listener};
 use tracing::debug;
 
 pub async fn add_listener(
@@ -10,7 +9,7 @@ pub async fn add_listener(
     Json(listener): Json<Listener>,
 ) -> Result<impl IntoResponse> {
     debug!("Adding new listener {}", listener.listener.id);
-    crate::db::listener::add_listener(state.pool, listener).await?;
+    common::db::listener::add_listener(state.pool, listener).await?;
     Ok(Json(""))
 }
 

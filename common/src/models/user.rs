@@ -14,6 +14,7 @@ pub struct User {
 pub struct Credentials {
     pub username: String,
     pub password: String,
+    pub key: Option<String>,
 }
 
 impl AuthUser for User {

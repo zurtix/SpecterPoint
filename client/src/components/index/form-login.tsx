@@ -19,15 +19,16 @@ export default function LoginForm() {
       key: ""
     },
     onSubmit: async ({ value }) => {
-      invoke("login", value).then((_) =>
+      invoke("login", { "creds": value }).then((_) =>
         navigate({
           to: "/targets"
         })
-      ).catch(() =>
+      ).catch((err) =>
         toast({
           variant: "destructive",
           title: "Failed to login",
-          description: "Review username, password, and encryption key",
+          // description: "Review username, password, and encryption key",
+          description: err
         })
       )
     },
