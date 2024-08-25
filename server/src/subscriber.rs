@@ -92,7 +92,7 @@ pub async fn log_listen(tx: broadcast::Sender<String>, listener: TcpListener) {
     }
 }
 
-pub async fn init() {
+pub async fn init(host: &str, port: u16) {
     let (tx, _rx) = broadcast::channel(100);
     let broadcast_subscriber = BroadcastSubscriber::new(tx.clone());
 
@@ -100,6 +100,8 @@ pub async fn init() {
         .with(broadcast_subscriber)
         .init();
 
-    let listener = TcpListener::bind("localhost:8081").await.unwrap();
+    let listener = TcpListener::bind(format!("{}:{}", host, port))
+        .await
+        .unwrap();
     tokio::spawn(log_listen(tx, listener));
 }

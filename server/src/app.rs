@@ -31,7 +31,7 @@ impl App {
         })
     }
 
-    pub async fn serve(self) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn serve(self, config: Config) -> Result<(), Box<dyn std::error::Error>> {
         let session_store = SqliteStore::new(self.pool.clone());
         session_store
             .migrate()
@@ -53,8 +53,6 @@ impl App {
 
         let backend = Backend::new(self.pool.clone());
         let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();
-
-        let config = envy::from_env::<Config>().expect("Failed to read environment variables");
 
         let host = format!("{}:{}", &config.host, &config.port);
 
