@@ -4,14 +4,12 @@ mod auth;
 mod handlers;
 mod models;
 mod orchestrator;
+mod subscriber;
 
 use crate::app::App;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::DEBUG)
-        .init();
-
+    subscriber::init().await;
     App::new().await?.serve().await
 }

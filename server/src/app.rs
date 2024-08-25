@@ -55,6 +55,7 @@ impl App {
         let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();
 
         let config = envy::from_env::<Config>().expect("Failed to read environment variables");
+
         let host = format!("{}:{}", &config.host, &config.port);
 
         let app = api::routes(self)
