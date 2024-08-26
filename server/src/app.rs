@@ -1,4 +1,5 @@
 use crate::orchestrator::Orchestrator;
+use crate::subscriber;
 use crate::{api, auth, models::config::Config};
 use axum_login::{
     login_required,
@@ -31,7 +32,10 @@ impl App {
         })
     }
 
-    pub async fn serve(self, config: Config) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn serve(self) -> Result<(), Box<dyn std::error::Error>> {
+        let config = envy::from_env::<Config>().expect("Failed to read environment variables");
+        subscriber::init(&config.host, config.log_port, self.pool.clone()).await;
+
         let session_store = SqliteStore::new(self.pool.clone());
         session_store
             .migrate()

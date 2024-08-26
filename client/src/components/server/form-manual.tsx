@@ -19,6 +19,7 @@ export function ManualServer({ setOpen }: { setOpen: React.Dispatch<React.SetSta
       name: "",
       host: "",
       port: 0,
+      log_port: 0,
       username: "",
       password: "",
       type: "manual"
@@ -49,24 +50,26 @@ export function ManualServer({ setOpen }: { setOpen: React.Dispatch<React.SetSta
       form.handleSubmit()
     }}>
       <div className="grid grid-cols-2 justify-between gap-4">
-        <form.Field
-          name="name"
-          validators={{
-            onChangeAsync: z.string().min(1, "A unique name is required"),
-            onChangeAsyncDebounceMs: 500
-          }}
-          children={(field) => (
-            <FormItem field={field}>
-              <Input
-                id={field.name}
-                placeholder="Ghosty HTTP server"
-                name={field.name}
-                onChange={(e) => field.handleChange(e.target.value)}
-              />
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-4 gap-2">
+        <div className="col-span-2">
+          <form.Field
+            name="name"
+            validators={{
+              onChangeAsync: z.string().min(1, "A unique name is required"),
+              onChangeAsyncDebounceMs: 500
+            }}
+            children={(field) => (
+              <FormItem field={field}>
+                <Input
+                  id={field.name}
+                  placeholder="Ghosty HTTP server"
+                  name={field.name}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid grid-cols-4 gap-2 col-span-2">
           <form.Field
             name="host"
             validators={{
@@ -76,7 +79,7 @@ export function ManualServer({ setOpen }: { setOpen: React.Dispatch<React.SetSta
             children={(field) => (
               <FormItem
                 field={field}
-                className="col-span-3">
+                className="col-span-2">
                 <Input
                   placeholder="127.0.0.1"
                   id={field.name}
@@ -107,6 +110,29 @@ export function ManualServer({ setOpen }: { setOpen: React.Dispatch<React.SetSta
               </FormItem>
             )}
           />
+          <form.Field
+            name="log_port"
+            validators={{
+              onChangeAsync: z.number()
+                .min(1, "Port range must be between 1-65535")
+                .max(65535, "Port range must be between 1-65535"),
+              onChangeAsyncDebounceMs: 200
+            }}
+            children={(field) => (
+              <FormItem
+                field={field}
+                label="Log port">
+                <Input
+                  type="number"
+                  placeholder="80"
+                  id={field.name}
+                  name={field.name}
+                  onChange={(e) => field.handleChange(e.target.valueAsNumber)}
+                />
+              </FormItem>
+            )}
+          />
+
         </div>
         <form.Field
           name="username"

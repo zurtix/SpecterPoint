@@ -10,7 +10,7 @@ pub struct User {
     pub password: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Credentials {
     pub username: String,
     pub password: String,
@@ -55,9 +55,10 @@ impl AuthnBackend for Backend {
             .fetch_optional(&self.db)
             .await?;
 
-        tokio::task::spawn_blocking(|| {
+        tokio::task::spawn_blocking(move || {
             Ok(user.filter(|user| {
-                crate::crypt::hash::verify_password_hash(creds.password, &user.password).is_ok()
+                crate::crypt::hash::verify_password_hash(user.password.clone(), &creds.password)
+                    .is_ok()
             }))
         })
         .await?

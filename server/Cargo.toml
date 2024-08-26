@@ -19,6 +19,8 @@ axum-login = "0.15.3"
 tokio-util = "0.7.11"
 chrono = "0.4.38"
 tracing-core = "0.1.32"
+tokio-stream = "0.1.15"
+futures-util = "0.3.30"
 tower-sessions-sqlx-store = { version = "0.13.0", features = ["sqlite"] }
 tower-sessions = { version = "0.12.2", default-features = false, features = [
   "signed",

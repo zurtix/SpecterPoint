@@ -1,8 +1,10 @@
 use crate::app::App;
 use axum::{extract::State, response::IntoResponse, Json};
 use common::{db::listener::get_listener_ids, error::Result, models::listener::ListenerState};
+use tracing::debug;
 
 pub async fn get_listeners(State(state): State<App>) -> Result<impl IntoResponse> {
+    debug!("Getting all listeners");
     let listeners = get_listener_ids(state.pool).await?;
 
     let mut states = vec![];

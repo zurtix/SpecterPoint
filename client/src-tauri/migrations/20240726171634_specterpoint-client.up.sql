@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS servers (
     "host" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     port INTEGER NOT NULL,
+  log_port INTEGER NOT NULL,
     username TEXT NOT NULL,
     password TEXT NOT NULL
 );

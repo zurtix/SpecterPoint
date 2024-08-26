@@ -4,6 +4,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
+import { EventViewer } from '@/components/eventviewer'
 
 export const Route = createFileRoute('/_auth/targets')({
   component: () =>
@@ -19,8 +20,8 @@ export const Route = createFileRoute('/_auth/targets')({
       <ResizablePanel defaultSize={50}>
         <ResizablePanelGroup direction="vertical">
           <ResizablePanel defaultSize={25}>
-            <div className="flex h-full items-center justify-center p-6">
-              <span className="font-semibold">Two</span>
+            <div className="flex h-full items-center justify-center overflow-scroll">
+              <EventViewer />
             </div>
           </ResizablePanel>
           <ResizableHandle />
@@ -33,3 +34,6 @@ export const Route = createFileRoute('/_auth/targets')({
       </ResizablePanel>
     </ResizablePanelGroup>
 })
+
+
+

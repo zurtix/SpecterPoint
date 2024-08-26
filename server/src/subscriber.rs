@@ -1,8 +1,15 @@
+use common::{
+    crypt::hash::verify_password_hash, db::user::get_user, models::log::LogMessage,
+    models::user::Credentials,
+};
+use futures_util::SinkExt;
+use sqlx::SqlitePool;
 use tokio::{
-    io::AsyncWriteExt,
     net::{TcpListener, TcpStream},
     sync::broadcast,
 };
+use tokio_stream::StreamExt;
+use tokio_util::codec::{Framed, LinesCodec};
 use tracing::{field::Visit, Event};
 use tracing_core::{subscriber::Subscriber, Field};
 use tracing_subscriber::{
@@ -13,21 +20,12 @@ use tracing_subscriber::{
 };
 
 pub struct BroadcastSubscriber {
-    sender: broadcast::Sender<String>,
+    sender: broadcast::Sender<LogMessage>,
 }
 
 impl BroadcastSubscriber {
-    pub fn new(sender: broadcast::Sender<String>) -> Self {
+    pub fn new(sender: broadcast::Sender<LogMessage>) -> Self {
         Self { sender }
-    }
-}
-
-pub async fn handle_client(mut socket: TcpStream, mut receiver: broadcast::Receiver<String>) {
-    while let Ok(log_message) = receiver.recv().await {
-        if let Err(e) = socket.write_all(log_message.as_bytes()).await {
-            eprintln!("Failed to send message to client: {}", e);
-            return;
-        }
     }
 }
 
@@ -40,14 +38,11 @@ where
         let mut visitor = StringVisitor::new();
         event.record(&mut visitor);
 
-        let message = format!(
-            "{} {}: {}\n",
-            chrono::Utc::now().to_rfc3339(),
-            metadata.level(),
-            visitor.output
-        );
-
-        let _ = self.sender.send(message);
+        let _ = self.sender.send(LogMessage {
+            timestamp: chrono::Utc::now().to_rfc3339(),
+            level: metadata.level().to_string(),
+            message: visitor.output,
+        });
     }
 }
 
@@ -80,19 +75,47 @@ impl Visit for StringVisitor {
     }
 }
 
-pub async fn log_listen(tx: broadcast::Sender<String>, listener: TcpListener) {
+pub async fn handle_client(
+    socket: TcpStream,
+    mut receiver: broadcast::Receiver<LogMessage>,
+    pool: SqlitePool,
+) {
+    let mut framed = Framed::new(socket, LinesCodec::new());
+
+    if let Some(Ok(line)) = framed.next().await {
+        if let Ok(creds) = serde_json::from_str::<Credentials>(&line) {
+            if let Ok(user) = get_user(pool.clone(), &creds.username).await {
+                if let Ok(valid) = verify_password_hash(user.password, &creds.password) {
+                    if valid {
+                        while let Ok(log_message) = receiver.recv().await {
+                            if let Ok(message) = serde_json::to_string(&log_message) {
+                                let _ = framed.send(message).await;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+pub async fn log_listen(
+    tx: broadcast::Sender<LogMessage>,
+    listener: TcpListener,
+    pool: SqlitePool,
+) {
     loop {
         match listener.accept().await {
             Ok((socket, _)) => {
                 let receiver = tx.subscribe();
-                tokio::spawn(handle_client(socket, receiver));
+                tokio::spawn(handle_client(socket, receiver, pool.clone()));
             }
             Err(e) => eprintln!("Failed to accept log connection: {}", e),
         }
     }
 }
 
-pub async fn init(host: &str, port: u16) {
+pub async fn init(host: &str, port: u16, pool: SqlitePool) {
     let (tx, _rx) = broadcast::channel(100);
     let broadcast_subscriber = BroadcastSubscriber::new(tx.clone());
 
@@ -103,5 +126,5 @@ pub async fn init(host: &str, port: u16) {
     let listener = TcpListener::bind(format!("{}:{}", host, port))
         .await
         .unwrap();
-    tokio::spawn(log_listen(tx, listener));
+    tokio::spawn(log_listen(tx, listener, pool));
 }

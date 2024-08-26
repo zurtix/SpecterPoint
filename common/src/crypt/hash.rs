@@ -29,6 +29,7 @@ mod hash_tests {
     #[test]
     fn successfully_generate_hash() {
         let hash = generate_password_hash(DATA).unwrap();
+        println!("{}", hash);
         assert_ne!(DATA, hash);
     }
 
