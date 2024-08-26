@@ -38,11 +38,13 @@ where
         let mut visitor = StringVisitor::new();
         event.record(&mut visitor);
 
-        let _ = self.sender.send(LogMessage {
-            timestamp: chrono::Utc::now().to_rfc3339(),
-            level: metadata.level().to_string(),
-            message: visitor.output,
-        });
+        if !visitor.output.is_empty() {
+            let _ = self.sender.send(LogMessage {
+                timestamp: chrono::Utc::now().to_rfc3339(),
+                level: metadata.level().to_string(),
+                message: visitor.output,
+            });
+        }
     }
 }
 
@@ -59,19 +61,26 @@ impl StringVisitor {
 }
 impl Visit for StringVisitor {
     fn record_str(&mut self, field: &Field, value: &str) {
-        if !self.output.is_empty() {
-            self.output.push_str(", ");
+        if field.name() == "message" {
+            if !self.output.is_empty() {
+                self.output.push_str(", ");
+            }
+            self.output
+                .push_str(&format!("{}: {}", field.name(), value.replace('\n', "")));
         }
-        self.output
-            .push_str(&format!("{}: {}", field.name(), value.replace('\n', "")));
     }
 
     fn record_debug(&mut self, field: &Field, value: &dyn std::fmt::Debug) {
         if !self.output.is_empty() {
             self.output.push_str(", ");
         }
-        self.output
-            .push_str(&format!("{}: {:?}", field.name(), value));
+
+        if field.name() == "message" {
+            let out = format!("{:?}", value);
+            if !out.is_empty() {
+                self.output.push_str(&out);
+            }
+        }
     }
 }
 

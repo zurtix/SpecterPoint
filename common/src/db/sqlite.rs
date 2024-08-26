@@ -1,8 +1,9 @@
-use std::path::Path;
+use std::{path::Path, str::FromStr};
 
 use sqlx::{
     migrate::{MigrateDatabase, Migrator},
-    sqlite::SqlitePool,
+    sqlite::{SqliteConnectOptions, SqlitePool},
+    ConnectOptions,
 };
 
 pub async fn init(db_url: &str, migrations: Option<&str>) {
@@ -17,7 +18,10 @@ pub async fn init(db_url: &str, migrations: Option<&str>) {
 }
 
 pub async fn connect(db_url: &str) -> SqlitePool {
-    SqlitePool::connect(db_url)
+    let opts = SqliteConnectOptions::from_str(db_url)
+        .expect("Failed to create connection options")
+        .disable_statement_logging();
+    SqlitePool::connect_with(opts)
         .await
         .expect("Failed to connect to database")
 }

@@ -30,7 +30,12 @@ impl TcpManager {
         addr: SocketAddr,
         app_handle: AppHandle,
     ) {
+        if self.connections.lock().unwrap().get(&id).is_some() {
+            return;
+        }
+
         let (tx, mut rx) = mpsc::channel(1);
+
         self.connections.lock().unwrap().insert(id, tx);
 
         let handle_clone = app_handle.clone();

@@ -4,6 +4,7 @@ export interface Server {
   type: string,
   host: string,
   port: number,
+  log_port: number,
   username: string,
   password: string
 }
@@ -13,6 +14,7 @@ export interface ServerBase {
   type: string,
   host: string,
   port: number,
+  log_port: number,
   username: string,
   password: string
 }

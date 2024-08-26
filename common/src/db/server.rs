@@ -6,11 +6,19 @@ use crate::{
 };
 
 pub async fn get_servers(pool: SqlitePool) -> Result<Vec<Server>> {
-    Ok(
-        sqlx::query_as(r#"SELECT id, name, type, host, port, username, password FROM servers"#)
-            .fetch_all(&pool)
-            .await?,
+    Ok(sqlx::query_as(
+        r#"SELECT id, name, type, host, port, log_port, username, password FROM servers"#,
     )
+    .fetch_all(&pool)
+    .await?)
+}
+
+pub async fn delete_server(pool: SqlitePool, id: &i64) -> Result<()> {
+    sqlx::query(r#"DELETE FROM servers WHERE id = ?1"#)
+        .bind(id)
+        .execute(&pool)
+        .await?;
+    Ok(())
 }
 
 pub async fn create_server(pool: SqlitePool, server: ServerBase, enc_pass: String) -> Result<i64> {

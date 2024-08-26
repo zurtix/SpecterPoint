@@ -10,6 +10,7 @@ pub fn make_handlers() -> impl Fn(tauri::Invoke<tauri::Wry>) {
         is_setup_required,
         server::add_server,
         server::all_servers,
+        server::remove_server,
         login::login,
         user::user_create,
         quit

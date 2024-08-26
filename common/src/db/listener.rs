@@ -97,10 +97,10 @@ pub async fn add_listener(pool: SqlitePool, lstn: Listener) -> Result<()> {
     Ok(())
 }
 
-pub async fn create_listener(pool: SqlitePool, create: CreateListener) -> Result<()> {
+pub async fn create_listener(pool: SqlitePool, create: CreateListener) -> Result<i64> {
     let mut transaction = pool.begin().await?;
 
-    let listener_id = sqlx::query_as::<_, (i64,)>(
+    let listener_id: i64 = sqlx::query_scalar(
         r#"
     INSERT TO listeners (name, host, port, type)
     VALUES ()
@@ -118,7 +118,7 @@ pub async fn create_listener(pool: SqlitePool, create: CreateListener) -> Result
         QueryBuilder::new("INSERT INTO endpoints(listener_id, endpoint)");
 
     endpoint_query_builder.push_values(create.endpoints, |mut b, endpoint| {
-        b.push_bind(listener_id.0);
+        b.push_bind(listener_id);
         b.push_bind(endpoint);
     });
     endpoint_query_builder.push("RETURNING id");
@@ -130,7 +130,7 @@ pub async fn create_listener(pool: SqlitePool, create: CreateListener) -> Result
 
     transaction.commit().await?;
 
-    Ok(())
+    Ok(listener_id)
 }
 
 pub async fn delete_listener(pool: SqlitePool, id: &i64) -> Result<()> {

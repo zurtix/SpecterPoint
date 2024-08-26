@@ -11,17 +11,37 @@ import {
 } from "@/components/ui/resizable"
 import { Server } from "@/components/server/types"
 import { invoke } from "@tauri-apps/api/tauri"
+import { useToast } from "../ui/use-toast"
 
 export function Servers() {
-  const [server, setServer] = useState<Server>();
+  const [server, setServer] = useState<Server>()
   const [servers, setServers] = useState<Server[]>()
+  const { toast } = useToast();
 
   useEffect(() => {
     invoke<Server[]>("all_servers").then((srvs) => (
       setServers(srvs)
     ))
-  }, [])
+  }, [servers])
 
+
+  function remove(id: number) {
+    invoke("remove_server", { "id": id }).then(() => {
+      setServers(prev => prev?.filter(s => s.id !== id))
+      setServer(undefined)
+      toast({
+        variant: "default",
+        title: "Successfully deleted server",
+        description: `Successfully removed server [${id}]`
+      })
+    }).catch((err) => (
+      toast({
+        variant: "destructive",
+        title: "Failed to deleted server",
+        description: err
+      })
+    ))
+  }
 
   function handleSearch(val: string) {
     setServers(servers!.filter(s => s.name.includes(val)))
@@ -53,7 +73,7 @@ export function Servers() {
       </ResizablePanel>
       <ResizableHandle />
       <ResizablePanel defaultSize={75}>
-        <ServerView server={server} />
+        <ServerView server={server} remove={remove} />
       </ResizablePanel>
     </ResizablePanelGroup>
   )
