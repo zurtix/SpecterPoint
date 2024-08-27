@@ -18,6 +18,7 @@ import { useState } from 'react'
 import ListenerForm from '@/components/listener/form-listener'
 import { CreateServer } from "@/components/server/create"
 import { invoke } from '@tauri-apps/api/tauri'
+import { CreateListener } from "./listener/create"
 
 export function Navigation() {
   const [isCreateListenerOpen, setIsCreateListenerOpen] = useState(false);
@@ -25,14 +26,7 @@ export function Navigation() {
 
   return (
     <div>
-      <ResponsiveDialog
-        isOpen={isCreateListenerOpen}
-        setIsOpen={setIsCreateListenerOpen}
-        title="Create new Listener"
-        description="Fill out the form below to create a new listener"
-      >
-        <ListenerForm />
-      </ResponsiveDialog>
+      <CreateListener open={isCreateListenerOpen} setOpen={setIsCreateListenerOpen} />
       <CreateServer open={isCreateServerOpen} setOpen={setIsCreateServerOpen} />
       <div className="z-70 p-2 fixed bottom-0 left-0 w-full">
         <hr className='mb-1' />

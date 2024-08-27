@@ -82,7 +82,7 @@ export default function LoginForm() {
           <form.Field
             name="key"
             validators={{
-              onChangeAsync: z.string()
+              onChange: z.string()
                 .min(32, "Key must be a minimum of 32 character(s)")
                 .max(32, "Key must be a maximum of 32 character(s)"),
               onChangeAsyncDebounceMs: 800

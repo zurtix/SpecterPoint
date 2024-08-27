@@ -1,6 +1,10 @@
 use common::{
-    crypt::hash::verify_password_hash, db::user::get_user, models::log::LogMessage,
-    models::user::Credentials,
+    crypt::hash::verify_password_hash,
+    db::user::get_user,
+    models::{
+        log::LogMessage,
+        user::{BaseCredential, Credentials},
+    },
 };
 use futures_util::SinkExt;
 use sqlx::SqlitePool;
@@ -92,7 +96,7 @@ pub async fn handle_client(
     let mut framed = Framed::new(socket, LinesCodec::new());
 
     if let Some(Ok(line)) = framed.next().await {
-        if let Ok(creds) = serde_json::from_str::<Credentials>(&line) {
+        if let Ok(creds) = serde_json::from_str::<BaseCredential>(&line) {
             if let Ok(user) = get_user(pool.clone(), &creds.username).await {
                 if let Ok(valid) = verify_password_hash(user.password, &creds.password) {
                     if valid {

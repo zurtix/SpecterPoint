@@ -9,16 +9,8 @@ pub async fn add_user(
     State(state): State<App>,
     Json(creds): Json<Credentials>,
 ) -> Result<impl IntoResponse> {
-    debug!("Adding new user {}", creds.username);
-    let pass = generate_password_hash(&creds.password)?;
-    common::db::user::create_user(
-        state.pool,
-        Credentials {
-            username: creds.username,
-            password: pass,
-            key: None,
-        },
-    )
-    .await?;
+    debug!("Adding new user {}", creds.auth.username);
+    let pass = generate_password_hash(&creds.auth.password)?;
+    common::db::user::create_user(state.pool, creds.auth).await?;
     Ok(Json(""))
 }

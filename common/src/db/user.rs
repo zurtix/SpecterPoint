@@ -1,6 +1,6 @@
 use crate::{
     error::Result,
-    models::user::{Credentials, User},
+    models::user::{BaseCredential, User},
 };
 use sqlx::SqlitePool;
 
@@ -15,7 +15,7 @@ pub async fn get_user(pool: SqlitePool, username: &str) -> Result<User> {
     )
 }
 
-pub async fn create_user(pool: SqlitePool, user: Credentials) -> Result<()> {
+pub async fn create_user(pool: SqlitePool, user: BaseCredential) -> Result<()> {
     sqlx::query(r#"INSERT INTO users (username, password) VALUES (?1, ?2)"#)
         .bind(user.username)
         .bind(user.password)

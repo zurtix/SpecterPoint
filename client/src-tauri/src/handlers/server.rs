@@ -3,7 +3,7 @@ use common::crypt::aes::encrypt;
 use common::db::server::{create_server, delete_server, get_servers};
 use common::error::Result;
 use common::models::server::{Server, ServerBase};
-use common::models::user::Credentials;
+use common::models::user::BaseCredential;
 
 #[tauri::command]
 pub async fn add_server(
@@ -15,10 +15,9 @@ pub async fn add_server(
 
     let id = create_server(state.pool.clone(), server.clone(), encrypted_password).await?;
 
-    let creds = Credentials {
+    let creds = BaseCredential {
         username: server.username,
         password: server.password,
-        key: None,
     };
 
     println!("Adding to TCP Manager");

@@ -9,10 +9,10 @@ pub async fn get_listeners(State(state): State<App>) -> Result<impl IntoResponse
 
     let mut states = vec![];
 
-    for listener in listeners {
+    for id in listeners {
         states.push(ListenerState {
-            id: listener.id,
-            running: state.orch.is_running(&listener.id).await,
+            id,
+            running: state.orch.is_running(&id).await,
         })
     }
 

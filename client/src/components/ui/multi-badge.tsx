@@ -67,12 +67,13 @@ export const MultiBadge = React.forwardRef<
     const [newValue, setNewValue] = React.useState<string>("");
 
     function handleChange(e: React.FormEvent<HTMLInputElement>) {
-      setNewValue(e.currentTarget.value);
+      const value = e.currentTarget.value
+      setNewValue(value)
     }
 
     function handleClick() {
       if (newValue && !selectedValues.includes(newValue)) {
-        setSelectedValues([...selectedValues, newValue]);
+        setSelectedValues(prev => [...prev, newValue]);
         onValueChange(selectedValues);
       }
 
@@ -83,14 +84,14 @@ export const MultiBadge = React.forwardRef<
       if (JSON.stringify(selectedValues) !== JSON.stringify([])) {
         setSelectedValues(selectedValues);
       }
-    }, [selectedValues]);
+    });
 
     return (
       <>
         <div>
           <div className="flex">
             <Input type="text" placeholder="index.html" onChange={handleChange} value={newValue} />
-            <Button type="button" className="bg-secondary ml-2" onClick={handleClick}><PlusIcon /></Button>
+            <Button type="button" className="bg-secondary ml-2" onClick={() => handleClick()}><PlusIcon /></Button>
           </div>
           <ScrollArea className="h-32 mt-6">
             {

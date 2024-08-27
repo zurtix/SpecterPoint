@@ -11,9 +11,15 @@ pub struct User {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Credentials {
+pub struct BaseCredential {
     pub username: String,
     pub password: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Credentials {
+    #[serde(flatten)]
+    pub auth: BaseCredential,
     pub key: Option<String>,
 }
 
@@ -51,14 +57,17 @@ impl AuthnBackend for Backend {
         creds: Self::Credentials,
     ) -> Result<Option<Self::User>, Self::Error> {
         let user: Option<Self::User> = sqlx::query_as("select * from users where username = ? ")
-            .bind(creds.username)
+            .bind(creds.auth.username)
             .fetch_optional(&self.db)
             .await?;
 
         tokio::task::spawn_blocking(move || {
             Ok(user.filter(|user| {
-                crate::crypt::hash::verify_password_hash(user.password.clone(), &creds.password)
-                    .is_ok()
+                crate::crypt::hash::verify_password_hash(
+                    user.password.clone(),
+                    &creds.auth.password,
+                )
+                .is_ok()
             }))
         })
         .await?

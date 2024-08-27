@@ -2,7 +2,7 @@ use crate::models::state::AppState;
 use common::crypt::hash::generate_password_hash;
 use common::db::user::create_user;
 use common::error::Error;
-use common::models::user::Credentials;
+use common::models::user::BaseCredential;
 
 #[tauri::command]
 pub async fn user_create(
@@ -12,13 +12,14 @@ pub async fn user_create(
 ) -> Result<(), Error> {
     let hash = generate_password_hash(password)?;
 
-    Ok(create_user(
+    create_user(
         state.pool.clone(),
-        Credentials {
+        BaseCredential {
             username: username.to_string(),
             password: hash,
-            key: None,
         },
     )
-    .await?)
+    .await?;
+
+    Ok(())
 }

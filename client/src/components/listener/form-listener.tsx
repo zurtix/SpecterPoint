@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { MultiBadge } from "@/components/ui/multi-badge"
+import { useToast } from "@/components/ui/use-toast"
+import { invoke } from "@tauri-apps/api/tauri"
 
 enum ListenerTypes {
   Http = "Http",
@@ -19,7 +21,9 @@ enum ListenerTypes {
   Tcp = "Tcp",
 }
 
-export default function ListenerForm() {
+export default function ({ setOpen }:
+  { setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
+  const { toast } = useToast()
   const form = useForm({
     defaultValues: {
       type: "",
@@ -29,7 +33,20 @@ export default function ListenerForm() {
       endpoints: [""]
     },
     onSubmit: async ({ value }) => {
-      console.log(value)
+      invoke("add_listener", { create: value }).then((_) => {
+        setOpen(false);
+        toast({
+          variant: "default",
+          title: "Successfully added listener",
+          description: `${value.name} was successfully added`,
+        })
+      }).catch((err) => (
+        toast({
+          variant: "destructive",
+          title: "Failed to add listener",
+          description: err,
+        })
+      ))
     },
     validatorAdapter: zodValidator()
   })

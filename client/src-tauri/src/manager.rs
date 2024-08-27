@@ -1,5 +1,5 @@
 use common::models::log::LogMessage;
-use common::models::user::Credentials;
+use common::models::user::{BaseCredential, Credentials};
 use futures_util::stream::StreamExt;
 use futures_util::SinkExt;
 use std::collections::HashMap;
@@ -25,7 +25,7 @@ impl TcpManager {
 
     pub async fn add_connection(
         &self,
-        creds: Credentials,
+        creds: BaseCredential,
         id: i64,
         addr: SocketAddr,
         app_handle: AppHandle,

@@ -17,6 +17,8 @@ pub enum Error {
     Decode(#[from] hex::FromHexError),
     #[error(transparent)]
     TaskJoin(#[from] tokio::task::JoinError),
+    #[error(transparent)]
+    Http(#[from] reqwest::Error),
 }
 
 impl From<aes_gcm::Error> for Error {
@@ -54,7 +56,8 @@ impl IntoResponse for Error {
             | Error::Sqlx(_)
             | Error::Encrypt(_)
             | Error::Decode(_)
-            | Self::TaskJoin(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            | Self::TaskJoin(_)
+            | Self::Http(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Error::Auth => StatusCode::UNAUTHORIZED,
         };
 

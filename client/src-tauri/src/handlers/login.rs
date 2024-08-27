@@ -5,7 +5,7 @@ use common::{
     crypt::{aes::decrypt, hash::verify_password_hash},
     db::{server::get_servers, user::get_user},
     error::Error,
-    models::user::{Credentials, User},
+    models::user::{BaseCredential, Credentials, User},
 };
 
 #[tauri::command]
@@ -14,9 +14,9 @@ pub async fn login(
     state: tauri::State<'_, AppState>,
     creds: Credentials,
 ) -> Result<(), Error> {
-    let user: User = get_user(state.pool.clone(), &creds.username).await?;
+    let user: User = get_user(state.pool.clone(), &creds.auth.username).await?;
 
-    if verify_password_hash(user.password, &creds.password)? {
+    if verify_password_hash(user.password, &creds.auth.password)? {
         if let Some(key) = creds.key {
             state.set_key(key.to_string());
         }
@@ -36,10 +36,9 @@ async fn connect_logs(app_handle: tauri::AppHandle, state: tauri::State<'_, AppS
         state
             .manager
             .add_connection(
-                Credentials {
+                BaseCredential {
                     username: server.server.username,
                     password,
-                    key: None,
                 },
                 server.id,
                 SocketAddr::from_str(&format!(

@@ -16,8 +16,7 @@ CREATE TABLE IF NOT EXISTS listeners (
 CREATE TABLE IF NOT EXISTS endpoints (
     id INTEGER PRIMARY KEY,
     listener_id INTEGER NOT NULL,
-    endpoint TEXT NOT NULL,
-    FOREIGN KEY (listener_id) REFERENCES listeners (id)
+    endpoint TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS servers (
