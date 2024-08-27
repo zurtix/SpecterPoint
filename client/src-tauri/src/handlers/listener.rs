@@ -123,9 +123,14 @@ pub async fn remove_listener(state: tauri::State<'_, AppState>, id: i64) -> Resu
         .build()
         .await;
 
-        let res = client
+        stop_listener(state.clone(), id).await?;
+
+        let _ = client
             .request::<Value>(reqwest::Method::DELETE, &format!("/listeners/{}", id), None)
             .await?;
     }
+
+    delete_listener(state.pool.clone(), &id).await?;
+
     Ok(())
 }

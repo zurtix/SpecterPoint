@@ -21,7 +21,7 @@ export default function LoginForm() {
     onSubmit: async ({ value }) => {
       invoke("login", { "creds": value }).then((_) =>
         navigate({
-          to: "/targets"
+          to: "/agents"
         })
       ).catch((err) =>
         toast({

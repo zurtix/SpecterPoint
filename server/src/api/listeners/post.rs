@@ -18,7 +18,7 @@ pub async fn start_listener(
     State(state): State<App>,
     Path(id): Path<i64>,
 ) -> Result<impl IntoResponse> {
-    info!("Starting {}", id);
+    info!("Starting listener {}", id);
     state.orch.start_listener(&id).await?;
     Ok(Json(""))
 }
@@ -27,7 +27,7 @@ pub async fn stop_listener(
     State(state): State<App>,
     Path(id): Path<i64>,
 ) -> Result<impl IntoResponse> {
-    info!("Stopping {}", id);
+    info!("Stopping listener {}", id);
     state.orch.stop_listener(&id).await;
     Ok(Json(""))
 }

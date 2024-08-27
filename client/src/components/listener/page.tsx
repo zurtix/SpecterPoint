@@ -28,8 +28,8 @@ export function Listeners() {
 
   function remove(id: number) {
     invoke("remove_listener", { "id": id }).then(() => {
-      setListeners(prev => prev?.filter(s => s.id !== id))
-      setListeners(undefined)
+      setListeners(prev => prev?.filter(s => s.id === id))
+      setListener(undefined)
       toast({
         variant: "default",
         title: "Successfully deleted listener",

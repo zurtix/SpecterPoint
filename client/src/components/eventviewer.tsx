@@ -54,12 +54,12 @@ export function EventViewer() {
   return (
     <div className="flex flex-col h-full w-full overflow-hidden">
       <div className="text-center">
-        <div className="flex justify-between h-full">
-          <Label className="p-4">Event messages</Label>
-          <div className="text-right p-2">
+        <div className="p-2">
+          <div className="flex justify-between">
+            <Label>Event Viewer</Label>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-6 w-12 p-2">Filter</Button>
+                <Button variant="ghost" className="h-4 w-12 p-2">Filter</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
                 <DropdownMenuCheckboxItem

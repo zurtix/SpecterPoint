@@ -41,7 +41,7 @@ export function ListenerView({ listener, remove }: { listener?: Listener, remove
 
   return (
     (listener &&
-      <div className="w-full p-4">
+      <div className="flex flex-col gap-4 w-full p-4">
         <Button type="button" onClick={() => remove(listener.id)}>Delete</Button>
         <Button type="button" onClick={start} className="bg-green-500">Start</Button>
         <Button type="button" onClick={stop} className="bg-red-500">Stop</Button>

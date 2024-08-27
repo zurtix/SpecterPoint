@@ -14,9 +14,9 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as AuthImport } from './routes/_auth'
-import { Route as AuthTargetsImport } from './routes/_auth/targets'
 import { Route as AuthConfigurationImport } from './routes/_auth/configuration'
 import { Route as AuthBlacklistImport } from './routes/_auth/blacklist'
+import { Route as AuthAgentsImport } from './routes/_auth/agents'
 import { Route as AuthServersViewImport } from './routes/_auth/servers.view'
 import { Route as AuthListenersViewImport } from './routes/_auth/listeners.view'
 
@@ -36,11 +36,6 @@ const IndexLazyRoute = IndexLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
 
-const AuthTargetsRoute = AuthTargetsImport.update({
-  path: '/targets',
-  getParentRoute: () => AuthRoute,
-} as any)
-
 const AuthConfigurationRoute = AuthConfigurationImport.update({
   path: '/configuration',
   getParentRoute: () => AuthRoute,
@@ -48,6 +43,11 @@ const AuthConfigurationRoute = AuthConfigurationImport.update({
 
 const AuthBlacklistRoute = AuthBlacklistImport.update({
   path: '/blacklist',
+  getParentRoute: () => AuthRoute,
+} as any)
+
+const AuthAgentsRoute = AuthAgentsImport.update({
+  path: '/agents',
   getParentRoute: () => AuthRoute,
 } as any)
 
@@ -79,6 +79,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
+    '/_auth/agents': {
+      id: '/_auth/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AuthAgentsImport
+      parentRoute: typeof AuthImport
+    }
     '/_auth/blacklist': {
       id: '/_auth/blacklist'
       path: '/blacklist'
@@ -91,13 +98,6 @@ declare module '@tanstack/react-router' {
       path: '/configuration'
       fullPath: '/configuration'
       preLoaderRoute: typeof AuthConfigurationImport
-      parentRoute: typeof AuthImport
-    }
-    '/_auth/targets': {
-      id: '/_auth/targets'
-      path: '/targets'
-      fullPath: '/targets'
-      preLoaderRoute: typeof AuthTargetsImport
       parentRoute: typeof AuthImport
     }
     '/_auth/listeners/view': {
@@ -122,9 +122,9 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren({
   IndexLazyRoute,
   AuthRoute: AuthRoute.addChildren({
+    AuthAgentsRoute,
     AuthBlacklistRoute,
     AuthConfigurationRoute,
-    AuthTargetsRoute,
     AuthListenersViewRoute,
     AuthServersViewRoute,
   }),
@@ -148,12 +148,16 @@ export const routeTree = rootRoute.addChildren({
     "/_auth": {
       "filePath": "_auth.tsx",
       "children": [
+        "/_auth/agents",
         "/_auth/blacklist",
         "/_auth/configuration",
-        "/_auth/targets",
         "/_auth/listeners/view",
         "/_auth/servers/view"
       ]
+    },
+    "/_auth/agents": {
+      "filePath": "_auth/agents.tsx",
+      "parent": "/_auth"
     },
     "/_auth/blacklist": {
       "filePath": "_auth/blacklist.tsx",
@@ -161,10 +165,6 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_auth/configuration": {
       "filePath": "_auth/configuration.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/targets": {
-      "filePath": "_auth/targets.tsx",
       "parent": "/_auth"
     },
     "/_auth/listeners/view": {

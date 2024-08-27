@@ -24,7 +24,6 @@ export function Servers() {
     ))
   }, [servers])
 
-
   function remove(id: number) {
     invoke("remove_server", { "id": id }).then(() => {
       setServers(prev => prev?.filter(s => s.id !== id))

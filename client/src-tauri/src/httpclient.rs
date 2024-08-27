@@ -75,7 +75,6 @@ where
 
 impl Client {
     async fn authenticate(&self) -> Result<()> {
-        let body = serde_json::to_string(&self.creds).map_err(|_| Error::Auth)?;
         let res = self
             .client
             .post(format!("{}/login", self.server))

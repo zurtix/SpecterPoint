@@ -22,7 +22,7 @@ export default function SetupForm() {
     },
     onSubmit: async ({ value }) => {
       invoke("user_create", value)
-        .then(() => navigate({ to: '/targets' }))
+        .then(() => navigate({ to: '/agents' }))
         .catch(() =>
           toast({
             variant: "destructive",
