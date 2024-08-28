@@ -14,10 +14,11 @@ import { AgentItem } from "@/components/agent/item"
 import { useState } from "react"
 import { XIcon } from "lucide-react"
 
-const agents = ["5ed36b39eb1da5a6bcfdaa2a45df84ac"]
+const agents = ["5ed36b39eb1da5a6bcfdaa2a45df84ac", "test"]
 
 interface Interaction {
   history: string[],
+  commands: string[],
   id: string,
   type: string,
 }
@@ -39,10 +40,12 @@ export function Agents() {
       [...prev,
       {
         history: [`${type} is now open for agent ${id}`],
+        commands: [],
         id: id,
         type: type
       }
-      ])
+      ]
+    )
   }
 
   function setHistory(id: string, type: string, history: string[]) {
@@ -53,6 +56,17 @@ export function Agents() {
       inter.history = history
       setInteractions(inters)
     }
+  }
+
+  function setCommand(id: string, type: string, commands: string[]) {
+    let inters = [...interactions]
+    let inter = interactions.find(it => it.id === id && it.type === type)
+
+    if (inter) {
+      inter.commands = commands
+      setInteractions(inters)
+    }
+
   }
 
   return (
@@ -83,7 +97,9 @@ export function Agents() {
                 id={inter.id}
                 type={inter.type}
                 history={inter.history}
+                commands={inter.commands}
                 onHistory={setHistory}
+                onCommand={setCommand}
                 onExit={remove}
               />
             </TabsContent>

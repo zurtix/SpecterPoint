@@ -5,13 +5,16 @@ interface TerminalProps {
   id: string,
   type: string,
   history: string[],
+  commands: string[],
   onHistory: (id: string, type: string, history: string[]) => void,
+  onCommand: (id: string, type: string, command: string[]) => void,
   onExit: (id: string, type: string) => void
 }
 
-const Terminal: React.FC<TerminalProps> = ({ id, type, history, onHistory, onExit }) => {
+const Terminal: React.FC<TerminalProps> = ({ id, type, history, commands, onHistory, onCommand, onExit }) => {
   const [input, setInput] = useState<string>("");
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const [pos, setPos] = useState<number>(1);
 
   useEffect(() => {
     if (textAreaRef.current) {
@@ -25,14 +28,35 @@ const Terminal: React.FC<TerminalProps> = ({ id, type, history, onHistory, onExi
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    console.log(e.key)
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       processCommand(input.trim());
       setInput("");
+      setPos(0);
+    }
+
+    if (e.key == "ArrowUp") {
+      e.preventDefault()
+      if (pos <= commands.length) {
+        setInput(commands[commands.length - pos])
+        setPos(v => v + 1)
+      }
+    }
+
+    if (e.key == "ArrowDown") {
+      e.preventDefault()
+      if (pos > 1) {
+        setInput(commands[commands.length - pos])
+        setPos(v => v - 1)
+      } else {
+        setInput("")
+      }
     }
   };
 
   const processCommand = (command: string) => {
+    onCommand(id, type, [...commands.slice(-100), command])
     let response: string;
     switch (command.toLowerCase()) {
       case "help":
