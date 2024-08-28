@@ -20,7 +20,6 @@ pub async fn add_server(
         password: server.password,
     };
 
-    println!("Adding to TCP Manager");
     state
         .manager
         .add_connection(

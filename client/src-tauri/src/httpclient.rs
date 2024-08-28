@@ -3,9 +3,14 @@ use common::{
     models::user::BaseCredential,
 };
 use reqwest::{cookie::Jar, StatusCode};
-use serde_json::Value;
 use sqlx::types::Json;
 use std::sync::Arc;
+
+#[derive(Debug, Default)]
+pub struct ApiResponse<T = serde_json::Value> {
+    pub status: StatusCode,
+    pub json: Option<Json<T>>,
+}
 
 pub struct ClientBuilder {
     creds: BaseCredential,
@@ -26,7 +31,7 @@ impl ClientBuilder {
         self.proxy = Some(proxy)
     }
 
-    pub async fn build(self) -> Client {
+    pub async fn build(self) -> Result<Client> {
         let cookie_jar = Arc::new(Jar::default());
         let mut builder = reqwest::ClientBuilder::new()
             .cookie_store(true)
@@ -36,18 +41,8 @@ impl ClientBuilder {
             builder = builder.proxy(reqwest::Proxy::http(p).unwrap());
         }
 
-        Client {
-            creds: self.creds,
-            server: self.server,
-            client: builder.build().unwrap(),
-        }
+        Client::new(self.creds, self.server, builder).await
     }
-}
-
-#[derive(Debug)]
-pub struct ApiResponse<T> {
-    pub status: StatusCode,
-    pub json: Option<Json<T>>,
 }
 
 pub struct Client {
@@ -56,24 +51,21 @@ pub struct Client {
     client: reqwest::Client,
 }
 
-async fn handle_response<T>(response: reqwest::Response) -> Result<ApiResponse<T>>
-where
-    T: for<'a> serde::de::Deserialize<'a>,
-{
-    if response.status().is_success() {
-        Ok(ApiResponse {
-            status: response.status(),
-            json: Some(response.json().await?),
-        })
-    } else {
-        Ok(ApiResponse {
-            status: response.status(),
-            json: None,
-        })
-    }
-}
-
 impl Client {
+    async fn new(
+        creds: BaseCredential,
+        server: String,
+        builder: reqwest::ClientBuilder,
+    ) -> Result<Client> {
+        let c = Self {
+            server,
+            creds,
+            client: builder.build()?,
+        };
+        c.authenticate().await?;
+        Ok(c)
+    }
+
     async fn authenticate(&self) -> Result<()> {
         let res = self
             .client
@@ -89,63 +81,77 @@ impl Client {
         Ok(())
     }
 
-    pub async fn request<T>(
-        self,
-        method: reqwest::Method,
-        path: &str,
-        body: Option<Value>,
-    ) -> Result<ApiResponse<T>>
+    pub async fn get_json<ResponseType>(&self, path: &str) -> Result<ApiResponse<ResponseType>>
     where
-        T: for<'a> serde::de::Deserialize<'a>,
+        ResponseType: serde::de::DeserializeOwned,
     {
         self.authenticate().await?;
+        let res = self
+            .client
+            .get(format!("{}/api{}", self.server, path))
+            .send()
+            .await?;
 
-        let result = match method {
-            reqwest::Method::GET => {
-                let res = self
-                    .client
-                    .get(format!("{}/api{}", self.server, path))
-                    .send()
-                    .await?;
+        Ok(ApiResponse {
+            status: res.status(),
+            json: res.json().await?,
+        })
+    }
 
-                handle_response::<T>(res).await?
-            }
-            reqwest::Method::POST => {
-                if let Some(bdy) = body {
-                    let res = self
-                        .client
-                        .post(format!("{}/api{}", self.server, path))
-                        .json(&bdy)
-                        .send()
-                        .await?;
+    pub async fn post<ResponseType>(&self, path: &str) -> Result<ApiResponse<ResponseType>>
+    where
+        ResponseType: serde::de::DeserializeOwned,
+    {
+        self.authenticate().await?;
+        let res = self
+            .client
+            .post(format!("{}/api{}", self.server, path))
+            .send()
+            .await?;
 
-                    handle_response::<T>(res).await?
-                } else {
-                    let res = self
-                        .client
-                        .post(format!("{}/api{}", self.server, path))
-                        .send()
-                        .await?;
+        Ok(ApiResponse {
+            status: res.status(),
+            json: res.json().await?,
+        })
+    }
 
-                    handle_response::<T>(res).await?
-                }
-            }
-            reqwest::Method::DELETE => {
-                let res = self
-                    .client
-                    .delete(format!("{}/api{}", self.server, path))
-                    .send()
-                    .await?;
+    pub async fn post_json<ResponseType, BodyType>(
+        &self,
+        path: &str,
+        body: &BodyType,
+    ) -> Result<ApiResponse<ResponseType>>
+    where
+        ResponseType: serde::de::DeserializeOwned,
+        BodyType: serde::ser::Serialize,
+    {
+        self.authenticate().await?;
+        let res = self
+            .client
+            .post(format!("{}/api{}", self.server, path))
+            .json(body)
+            .send()
+            .await?;
 
-                handle_response::<T>(res).await?
-            }
-            _ => ApiResponse {
-                status: StatusCode::BAD_REQUEST,
-                json: None,
-            },
-        };
+        Ok(ApiResponse {
+            status: res.status(),
+            json: res.json().await?,
+        })
+    }
 
-        println!("{}", result.status);
-        Ok(result)
+    pub async fn delete<ResponseType>(&self, path: &str) -> Result<ApiResponse<ResponseType>>
+    where
+        ResponseType: serde::de::DeserializeOwned,
+    {
+        self.authenticate().await?;
+        let res = self
+            .client
+            .delete(&format!("{}/api{}", self.server, path))
+            .send()
+            .await?;
+
+        Ok(ApiResponse {
+            status: res.status(),
+            json: res.json().await?,
+        })
     }
 }

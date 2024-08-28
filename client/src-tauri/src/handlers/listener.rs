@@ -29,10 +29,10 @@ pub async fn add_listener(
             format!("http://{}:{}", server.server.host, server.server.port),
         )
         .build()
-        .await;
+        .await?;
 
         let res = client
-            .request::<Value>(reqwest::Method::POST, "/listeners", Some(json!(&listener)))
+            .post_json::<Value, ListenerWithEndpoints>("/listeners", &listener)
             .await?;
 
         if res.status.is_success() {
@@ -63,14 +63,10 @@ pub async fn start_listener(state: tauri::State<'_, AppState>, id: i64) -> Resul
             format!("http://{}:{}", server.server.host, server.server.port),
         )
         .build()
-        .await;
+        .await?;
 
         let _ = client
-            .request::<Value>(
-                reqwest::Method::POST,
-                &format!("/listeners/{}/start", id),
-                None,
-            )
+            .post::<Value>(&format!("/listeners/{}/start", id))
             .await?;
     }
 
@@ -89,14 +85,10 @@ pub async fn stop_listener(state: tauri::State<'_, AppState>, id: i64) -> Result
             format!("http://{}:{}", server.server.host, server.server.port),
         )
         .build()
-        .await;
+        .await?;
 
         let _ = client
-            .request::<Value>(
-                reqwest::Method::POST,
-                &format!("/listeners/{}/stop", id),
-                None,
-            )
+            .post::<Value>(&format!("/listeners/{}/stop", id))
             .await?;
     }
 
@@ -121,12 +113,12 @@ pub async fn remove_listener(state: tauri::State<'_, AppState>, id: i64) -> Resu
             format!("http://{}:{}", server.server.host, server.server.port),
         )
         .build()
-        .await;
+        .await?;
 
         stop_listener(state.clone(), id).await?;
 
         let _ = client
-            .request::<Value>(reqwest::Method::DELETE, &format!("/listeners/{}", id), None)
+            .delete::<Value>(&format!("/listeners/{}", id))
             .await?;
     }
 
