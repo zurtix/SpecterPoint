@@ -1,4 +1,4 @@
-import { Listener } from "@/components/listener/types"
+import { Listener } from "@/types/listener"
 import { Button } from "@/components/ui/button"
 import { invoke } from "@tauri-apps/api/tauri"
 import { useToast } from "../ui/use-toast"

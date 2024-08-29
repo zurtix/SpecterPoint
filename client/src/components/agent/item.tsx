@@ -15,7 +15,6 @@ export function AgentItem({ id, onInteract }: { id: string, onInteract: (id: str
     if (e.detail === 2) {
       onInteract(id, "command")
     }
-
   }
 
   return (

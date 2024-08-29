@@ -9,10 +9,10 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { Server } from "@/components/server/types"
+import { Server } from "@/types/server"
 import { invoke } from "@tauri-apps/api/tauri"
 import { useToast } from "../ui/use-toast"
-import { Listener } from "@/components/listener/types"
+import { Listener } from "@/types/listener"
 
 export function Listeners() {
   const [listener, setListener] = useState<Listener>()

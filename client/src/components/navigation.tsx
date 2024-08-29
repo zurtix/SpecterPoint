@@ -12,7 +12,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CreateServer } from "@/components/server/create"
 import { invoke } from '@tauri-apps/api/tauri'
 import { CreateListener } from "./listener/create"
@@ -21,6 +21,13 @@ import { Badge } from "./ui/badge"
 export function Navigation() {
   const [isCreateListenerOpen, setIsCreateListenerOpen] = useState(false);
   const [isCreateServerOpen, setIsCreateServerOpen] = useState(false);
+  const [count, setCount] = useState<number>(0)
+
+  useEffect(() => {
+    invoke<number>("agent_count")
+      .then((c) => setCount(c))
+      .catch(() => setCount(0))
+  }, [count])
 
   return (
     <div>
@@ -40,7 +47,7 @@ export function Navigation() {
                 <Link to="/agents" className='w-full'>
                   <div className="flex justify-between">
                     <p>Agents</p>
-                    <Badge className="bg-muted-foreground rounded">1</Badge>
+                    <Badge className="bg-muted-foreground rounded">{count}</Badge>
                   </div>
                 </Link>
               </DropdownMenuItem>

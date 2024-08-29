@@ -38,12 +38,11 @@ pub async fn add_server(
 #[tauri::command]
 pub async fn remove_server(state: tauri::State<'_, AppState>, id: i64) -> Result<()> {
     delete_server(state.pool.clone(), &id).await?;
-    state.manager.remove_connection(id);
+    state.manager.remove_connection(id).await;
     Ok(())
 }
 
 #[tauri::command]
 pub async fn all_servers(state: tauri::State<'_, AppState>) -> Result<Vec<Server>> {
-    let servers = get_servers(state.pool.clone()).await?;
-    Ok(servers)
+    get_servers(state.pool.clone()).await
 }

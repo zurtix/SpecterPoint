@@ -36,3 +36,11 @@ CREATE TABLE IF NOT EXISTS server_listeners (
     server_id INTEGER NOT NULL,
     listener_id INTEGER NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS agents (
+    id INTEGER PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS agent_tasks (
+    id INTEGER PRIMARY KEY
+);

@@ -93,6 +93,7 @@ export function Agents() {
                 <div className="flex w-full justify-between">
                   <p>{`${inter.type}: ${inter.id}`}</p>
                   <XIcon
+                    className="mt-1"
                     height={12}
                     width={12}
                     onClick={() => remove(inter.id, inter.type)} />

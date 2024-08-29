@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
-import { Listener } from "@/components/listener/types"
+import { Listener } from "@/types/listener"
 
 interface ListenerItemProps {
   listener: Listener
@@ -24,6 +23,5 @@ export function ListenerItem({ listener, onClick }: ListenerItemProps) {
         </div>
       </div>
     </button>
-
   )
 }

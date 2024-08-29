@@ -1,10 +1,7 @@
 use common::{
     crypt::hash::verify_password_hash,
     db::user::get_user,
-    models::{
-        log::LogMessage,
-        user::{BaseCredential, Credentials},
-    },
+    models::{log::LogMessage, user::BaseCredential},
 };
 use futures_util::SinkExt;
 use sqlx::SqlitePool;

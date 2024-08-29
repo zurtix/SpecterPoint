@@ -45,8 +45,7 @@ pub async fn add_listener(
 pub async fn all_listeners(
     state: tauri::State<'_, AppState>,
 ) -> Result<Vec<ListenerWithEndpoints>> {
-    let listeners = get_listseners(state.pool.clone()).await?;
-    Ok(listeners)
+    get_listseners(state.pool.clone()).await
 }
 
 #[tauri::command]

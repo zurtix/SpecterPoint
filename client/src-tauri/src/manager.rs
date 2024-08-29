@@ -4,14 +4,15 @@ use futures_util::stream::StreamExt;
 use futures_util::SinkExt;
 use std::collections::HashMap;
 use std::net::SocketAddr;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use tauri::AppHandle;
 use tauri::Manager;
 use tokio::net::TcpStream;
 use tokio::sync::mpsc;
+use tokio::sync::Mutex;
 use tokio_util::codec::{Framed, LinesCodec};
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct TcpManager {
     connections: Arc<Mutex<HashMap<i64, mpsc::Sender<()>>>>,
 }
@@ -30,13 +31,13 @@ impl TcpManager {
         addr: SocketAddr,
         app_handle: AppHandle,
     ) {
-        if self.connections.lock().unwrap().get(&id).is_some() {
+        if self.connections.lock().await.get(&id).is_some() {
             return;
         }
 
         let (tx, mut rx) = mpsc::channel(1);
 
-        self.connections.lock().unwrap().insert(id, tx);
+        self.connections.lock().await.insert(id, tx);
 
         let handle_clone = app_handle.clone();
 
@@ -71,9 +72,9 @@ impl TcpManager {
         });
     }
 
-    pub fn remove_connection(&self, id: i64) {
-        if let Some(tx) = self.connections.lock().unwrap().remove(&id) {
-            let _ = tx.send(());
+    pub async fn remove_connection(&self, id: i64) {
+        if let Some(tx) = self.connections.lock().await.remove(&id) {
+            let _ = tx.send(()).await;
         }
     }
 }

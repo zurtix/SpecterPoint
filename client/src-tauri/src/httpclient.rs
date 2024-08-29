@@ -96,7 +96,7 @@ impl Client {
                 let max_age_str = res
                     .headers()
                     .get("set-cookie")
-                    .and_then(|header| Some(header.to_str().unwrap_or("")))
+                    .map(|header| header.to_str().unwrap_or(""))
                     .and_then(|s| {
                         s.split(';').find_map(|cookie| {
                             let mut parts = cookie.trim().split('=');
