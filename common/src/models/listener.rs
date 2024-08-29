@@ -2,6 +2,7 @@ use crate::models::endpoint::Endpoint;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, sqlx::Type)]
+#[serde(rename_all = "lowercase")]
 pub enum ListenerTypes {
     Http,
     Https,

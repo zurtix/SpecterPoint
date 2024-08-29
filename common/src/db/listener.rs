@@ -2,21 +2,25 @@ use crate::{
     error::Result,
     models::{
         endpoint::Endpoint,
-        listener::{Listener, ListenerBase, ListenerBaseWithEndpoints, ListenerWithEndpoints},
+        listener::{Listener, ListenerBaseWithEndpoints, ListenerWithEndpoints},
     },
 };
-use sqlx::{Execute, QueryBuilder, Sqlite, SqlitePool};
+use sqlx::{QueryBuilder, Sqlite, SqlitePool};
 
 pub async fn get_listener(pool: SqlitePool, id: &i64) -> Result<ListenerWithEndpoints> {
     let listener = sqlx::query_as::<_, Listener>(
-        r#"SELECT id, name, host, type, port FROM listeners WHERE id = ?1"#,
+        r#"
+    SELECT id, name, host, type, port FROM listeners WHERE id = ?1
+    "#,
     )
     .bind(id)
     .fetch_one(&pool)
     .await?;
 
     let endpoints = sqlx::query_as::<_, Endpoint>(
-        "SELECT id, listener_id, endpoint FROM endpoints WHERE listener_id = ?1",
+        r#"
+    SELECT id, listener_id, endpoint FROM endpoints WHERE listener_id = ?1
+    "#,
     )
     .bind(id)
     .fetch_all(&pool)
@@ -31,8 +35,8 @@ pub async fn get_listener(pool: SqlitePool, id: &i64) -> Result<ListenerWithEndp
 pub async fn get_listseners(pool: SqlitePool) -> Result<Vec<ListenerWithEndpoints>> {
     let listeners = sqlx::query_as::<_, Listener>(
         r#"
-        SELECT id, name, host, port, type FROM listeners
-        "#,
+    SELECT id, name, host, port, type FROM listeners
+    "#,
     )
     .fetch_all(&pool)
     .await?;
@@ -41,8 +45,8 @@ pub async fn get_listseners(pool: SqlitePool) -> Result<Vec<ListenerWithEndpoint
     for base in listeners {
         let endpoints: Vec<Endpoint> = sqlx::query_as::<_, Endpoint>(
             r#"
-            SELECT id, endpoint WHERE listener_id = ?1
-            "#,
+        SELECT id, endpoint WHERE listener_id = ?1
+        "#,
         )
         .bind(base.id)
         .fetch_all(&pool)
@@ -59,9 +63,13 @@ pub async fn get_listseners(pool: SqlitePool) -> Result<Vec<ListenerWithEndpoint
 }
 
 pub async fn get_listener_ids(pool: SqlitePool) -> Result<Vec<i64>> {
-    Ok(sqlx::query_scalar(r#"SELECT id FROM listeners"#)
-        .fetch_all(&pool)
-        .await?)
+    Ok(sqlx::query_scalar(
+        r#"
+    SELECT id FROM listeners
+    "#,
+    )
+    .fetch_all(&pool)
+    .await?)
 }
 
 pub async fn add_listener(pool: SqlitePool, lstn: ListenerWithEndpoints) -> Result<()> {
@@ -69,8 +77,8 @@ pub async fn add_listener(pool: SqlitePool, lstn: ListenerWithEndpoints) -> Resu
 
     sqlx::query(
         r#"
-     INSERT INTO listeners (id, name, host, port, type) VALUES (?1, ?2, ?3, ?4, ?5)
-        "#,
+    INSERT INTO listeners (id, name, host, port, type) VALUES (?1, ?2, ?3, ?4, ?5)
+    "#,
     )
     .bind(lstn.listener.id)
     .bind(lstn.listener.listener.name)
@@ -135,15 +143,23 @@ pub async fn create_listener(pool: SqlitePool, create: &ListenerBaseWithEndpoint
 pub async fn delete_listener(pool: SqlitePool, id: &i64) -> Result<()> {
     let mut transaction = pool.begin().await.unwrap();
 
-    sqlx::query("DELETE FROM endpoints where listener_id = ?1")
-        .bind(id)
-        .execute(&mut *transaction)
-        .await?;
+    sqlx::query(
+        r#"
+    DELETE FROM endpoints where listener_id = ?1
+    "#,
+    )
+    .bind(id)
+    .execute(&mut *transaction)
+    .await?;
 
-    sqlx::query("DELETE FROM listeners where id = ?1")
-        .bind(id)
-        .execute(&mut *transaction)
-        .await?;
+    sqlx::query(
+        r#"
+    DELETE FROM listeners where id = ?1
+    "#,
+    )
+    .bind(id)
+    .execute(&mut *transaction)
+    .await?;
 
     transaction.commit().await?;
 
