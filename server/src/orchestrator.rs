@@ -1,5 +1,5 @@
-use crate::models::listener::Listen;
-use crate::models::listener::{HttpListener, HttpsListener, TcpListener};
+use crate::listeners::Listen;
+use crate::listeners::{http::HttpListener, https::HttpsListener, tcp::TcpListener};
 use axum::extract::FromRef;
 use common::db::listener::get_listener;
 use common::{error::Result, models::listener::ListenerTypes};

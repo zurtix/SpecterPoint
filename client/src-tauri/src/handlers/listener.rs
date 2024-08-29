@@ -14,7 +14,6 @@ use serde_json::Value;
 pub async fn add_listener(
     state: tauri::State<'_, AppState>,
     create: ListenerBaseWithEndpoints,
-    //    server_ids: Vec<i64>,
 ) -> Result<()> {
     let listener_id = create_listener(state.pool.clone(), &create).await?;
     let server_ids = get_server_ids(state.pool.clone()).await?;

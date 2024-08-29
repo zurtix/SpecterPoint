@@ -9,7 +9,7 @@ export interface Listener {
 
 export enum ListenerTypes {
   http = "http",
-  https = "http",
+  https = "https",
   tcp = "tcp",
 }
 

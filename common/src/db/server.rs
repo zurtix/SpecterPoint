@@ -8,7 +8,7 @@ use crate::{
 pub async fn get_server(pool: SqlitePool, id: &i64) -> Result<Server> {
     Ok(sqlx::query_as(
         r#"
-    SELECT id, name, type, host, port, log_port, username, password FROM servers WHERE id = ?1
+    SELECT id, name, type, scheme, host, port, log_port, username, password FROM servers WHERE id = ?1
     "#,
     )
     .bind(id)

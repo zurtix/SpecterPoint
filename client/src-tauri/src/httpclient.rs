@@ -29,6 +29,7 @@ pub struct ClientBuilder {
 
 impl ClientBuilder {
     pub fn new<T: std::fmt::Display>(server: &T) -> Self {
+        println!("{}", server);
         Self {
             server: server.to_string(),
             metadata: None,
