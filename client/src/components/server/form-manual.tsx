@@ -8,15 +8,24 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { invoke } from "@tauri-apps/api/tauri"
 import { useToast } from "@/components/ui/use-toast"
+import { ServerScheme } from "@/types/server"
 
 export function ManualServer({ setOpen }: { setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
   const { toast } = useToast()
   const form = useForm({
     defaultValues: {
       name: "",
+      scheme: "",
       host: "",
       port: 0,
       log_port: 0,
@@ -69,7 +78,28 @@ export function ManualServer({ setOpen }: { setOpen: React.Dispatch<React.SetSta
             )}
           />
         </div>
-        <div className="grid grid-cols-4 gap-2 col-span-2">
+        <div className="flex gap-2 col-span-2">
+          <form.Field
+            name="scheme"
+            validators={{
+              onChangeAsync: z.string()
+            }}
+            children={(field) => (
+              <FormItem field={field} className="w-[150px]">
+                <Select defaultValue={field.state.value} onValueChange={(v) => field.handleChange(v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(Object.values(ServerScheme) as Array<keyof typeof ServerScheme>).map((key) => (
+                      <SelectItem value={key}>{key}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
+
           <form.Field
             name="host"
             validators={{
@@ -79,7 +109,7 @@ export function ManualServer({ setOpen }: { setOpen: React.Dispatch<React.SetSta
             children={(field) => (
               <FormItem
                 field={field}
-                className="col-span-2">
+                className="w-[600px]">
                 <Input
                   placeholder="127.0.0.1"
                   id={field.name}

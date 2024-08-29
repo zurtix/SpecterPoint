@@ -1,5 +1,5 @@
 use common::models::log::LogMessage;
-use common::models::user::{BaseCredential, Credentials};
+use common::models::user::BaseCredential;
 use futures_util::stream::StreamExt;
 use futures_util::SinkExt;
 use std::collections::HashMap;

@@ -14,7 +14,7 @@ import { AgentItem } from "@/components/agent/item"
 import { useState } from "react"
 import { XIcon } from "lucide-react"
 
-const agents = ["5ed36b39eb1da5a6bcfdaa2a45df84ac", "test"]
+const agents = ["5ed36b39", "test"]
 
 interface Interaction {
   history: string[],
@@ -25,7 +25,7 @@ interface Interaction {
 
 export function Agents() {
 
-  const [interactions, setInteractions] = useState<Interaction[]>([]);
+  const [interactions, setInteractions] = useState<Interaction[]>([])
 
   function remove(id: string, type: string) {
     setInteractions(prev => prev.filter(p => p.id !== id || p.type != type))
@@ -66,14 +66,19 @@ export function Agents() {
       inter.commands = commands
       setInteractions(inters)
     }
+  }
 
+  function onMiddleClick(e: number, id: string, type: string) {
+    if (e === 1) {
+      remove(id, type)
+    }
   }
 
   return (
     <ResizablePanelGroup
       direction="horizontal">
-      <ResizablePanel defaultSize={10}>
-        <div className="flex flex-col p-2 text-sm h-full overflow-y-scroll">
+      <ResizablePanel defaultSize={10} minSize={17}>
+        <div className="flex flex-col p-2 text-sm h-full overflow-y-scroll gap-2">
           {agents.map(id => <AgentItem id={id} onInteract={add} />)}
         </div>
       </ResizablePanel>
@@ -82,17 +87,23 @@ export function Agents() {
         <Tabs className="h-full w-full">
           <TabsList>
             {interactions?.map(inter =>
-              <TabsTrigger value={`${inter.type}-${inter.id}`} className="flex gap-2">
-                {`${inter.type}: ${inter.id}`}
-                <XIcon
-                  height={12}
-                  width={12}
-                  onClick={() => remove(inter.id, inter.type)} />
+              <TabsTrigger value={`${inter.type}-${inter.id}`} className="w-full"
+                onClick={(e) => onMiddleClick(e.button, inter.id, inter.type)}
+              >
+                <div className="flex w-full justify-between">
+                  <p>{`${inter.type}: ${inter.id}`}</p>
+                  <XIcon
+                    height={12}
+                    width={12}
+                    onClick={() => remove(inter.id, inter.type)} />
+                </div>
               </TabsTrigger>
             )}
           </TabsList>
           {interactions?.map(inter =>
-            <TabsContent value={`${inter.type}-${inter.id}`} className="overflow-y-hidden h-full w-full" >
+            <TabsContent
+              value={`${inter.type}-${inter.id}`}
+              className="overflow-y-hidden h-full w-full">
               <Terminal
                 id={inter.id}
                 type={inter.type}
@@ -108,7 +119,6 @@ export function Agents() {
       </ResizablePanel>
     </ResizablePanelGroup >
   )
-
 }
 
 

@@ -53,8 +53,6 @@ export const FormLabel = React.forwardRef<
   FormLabelProps
 >(
   ({ field, label, className, ...props }, ref) => {
-
-    console.log(field.state.meta.errors)
     return (
       <Label
         ref={ref}

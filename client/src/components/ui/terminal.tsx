@@ -12,28 +12,27 @@ interface TerminalProps {
 }
 
 const Terminal: React.FC<TerminalProps> = ({ id, type, history, commands, onHistory, onCommand, onExit }) => {
-  const [input, setInput] = useState<string>("");
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [pos, setPos] = useState<number>(1);
+  const [input, setInput] = useState<string>("")
+  const textAreaRef = useRef<HTMLTextAreaElement>(null)
+  const [pos, setPos] = useState<number>(1)
 
   useEffect(() => {
     if (textAreaRef.current) {
-      textAreaRef.current.style.height = "auto";
-      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+      textAreaRef.current.style.height = "auto"
+      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`
     }
-  }, [input]);
+  }, [input])
 
   const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.currentTarget.value);
-  };
+    setInput(e.currentTarget.value)
+  }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    console.log(e.key)
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      processCommand(input.trim());
-      setInput("");
-      setPos(0);
+      e.preventDefault()
+      processCommand(input.trim())
+      setInput("")
+      setPos(0)
     }
 
     if (e.key == "ArrowUp") {
@@ -53,29 +52,29 @@ const Terminal: React.FC<TerminalProps> = ({ id, type, history, commands, onHist
         setInput("")
       }
     }
-  };
+  }
 
   const processCommand = (command: string) => {
     onCommand(id, type, [...commands.slice(-100), command])
     let response: string;
     switch (command.toLowerCase()) {
       case "help":
-        response = "Available commands: help, echo, clear";
-        break;
+        response = "Available commands: help, echo, clear"
+        break
       case "exit":
-        onExit(id, type);
-        return;
+        onExit(id, type)
+        return
       case "clear":
         onHistory(id, type, [])
-        return;
+        return
       case command.startsWith("echo") && command:
-        response = command.slice(5);
-        break;
+        response = command.slice(5)
+        break
       default:
-        response = `command not found: ${command}`;
+        response = `command not found: ${command}`
     }
-    onHistory(id, type, [...history, `> ${command}`, response]);
-  };
+    onHistory(id, type, [...history, `> ${command}`, response])
+  }
 
   return (
     <div className="w-full h-full text-sm p-2"
@@ -99,7 +98,7 @@ const Terminal: React.FC<TerminalProps> = ({ id, type, history, commands, onHist
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Terminal;
+export default Terminal

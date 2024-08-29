@@ -11,26 +11,23 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { MultiBadge } from "@/components/ui/multi-badge"
 import { useToast } from "@/components/ui/use-toast"
 import { invoke } from "@tauri-apps/api/tauri"
-
-enum ListenerTypes {
-  Http = "Http",
-  Https = "Https",
-  Tcp = "Tcp",
-}
+import { Badge } from "@/components/ui/badge"
+import { useState } from "react"
+import { ListenerTypes } from "@/types/listener"
 
 export default function ({ setOpen }:
   { setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
   const { toast } = useToast()
+  const [endpoint, setEndpoint] = useState<string>("");
   const form = useForm({
     defaultValues: {
       type: "",
       name: "",
       host: "",
       port: 0,
-      endpoints: [""]
+      endpoints: []
     },
     onSubmit: async ({ value }) => {
       invoke("add_listener", { create: value }).then((_) => {
@@ -50,6 +47,23 @@ export default function ({ setOpen }:
     },
     validatorAdapter: zodValidator()
   })
+
+  function handleEndpoint() {
+    let value = endpoint.startsWith('/') ? endpoint : '/' + endpoint
+    let prev = form.getFieldValue("endpoints")
+    setEndpoint("")
+
+    // @ts-ignore
+    if (prev.includes(value)) return
+
+    if (!prev) {
+      // @ts-ignore
+      form.setFieldValue("endpoints", [value])
+    }
+
+    // @ts-ignore
+    form.setFieldValue("endpoints", [...prev, value])
+  }
 
   return (
     <form onSubmit={(e) => {
@@ -88,6 +102,7 @@ export default function ({ setOpen }:
             children={(field) => (
               <FormItem field={field} description="Unique listener name">
                 <Input
+                  placeholder="Ghosty Listener"
                   id={field.name}
                   name={field.name}
                   value={field.state.value}
@@ -104,6 +119,7 @@ export default function ({ setOpen }:
             children={(field) => (
               <FormItem field={field} description="Remote hostname or IP">
                 <Input
+                  placeholder="127.0.0.1"
                   id={field.name}
                   name={field.name}
                   value={field.state.value}
@@ -119,7 +135,7 @@ export default function ({ setOpen }:
                 .max(65535, "A valid port must be provided"),
             }}
             children={(field) => (
-              <FormItem field={field} description="Remote port number">
+              <FormItem field={field} description="Port for the listener to listen on">
                 <Input
                   type="number"
                   id={field.name}
@@ -133,18 +149,41 @@ export default function ({ setOpen }:
         <div className="w-full">
           <form.Field
             name="endpoints"
+            validators={{
+            }}
             children={(field) => (
               <FormItem field={field} description="Endpoints for agent communications">
-                <MultiBadge
-                  onValueChange={(v) => field.handleChange(v)}
-                  placeholder="Enter endpoints"
-                />
+                <div className="flex flex-col gap-2">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="/specterpoint/index.html"
+                      id={field.name}
+                      name={field.name}
+                      value={endpoint}
+                      onChange={(e) => setEndpoint(e.currentTarget.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault()
+                          handleEndpoint()
+                        }
+                      }}
+                    />
+                    <Button type="button" onClick={() => {
+                      handleEndpoint()
+                    }}>+</Button>
+                  </div>
+                  <div className="flex gap-2">
+                    {field.state.value && field.state.value.map((value, idx) => (
+                      value && <Badge key={idx} className="cursor-pointer" onClick={() => field.removeValue(idx)}>{value}</Badge>
+                    ))}
+                  </div>
+                </div>
               </FormItem>
             )}
           />
         </div>
       </div>
       <Button type="submit" className="mt-4">Submit</Button>
-    </form>
+    </form >
   )
 }

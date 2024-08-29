@@ -1,4 +1,4 @@
-use crate::models::state::AppState;
+use crate::{httpclient::ClientBuilder, models::state::AppState};
 use common::{
     crypt::aes::decrypt,
     db::{
@@ -6,9 +6,9 @@ use common::{
         server::{create_server_listeners, get_server, get_server_ids, get_servers},
     },
     error::Result,
-    models::listener::{Listener, ListenerBaseWithEndpoints, ListenerWithEndpoints},
+    models::listener::{ListenerBaseWithEndpoints, ListenerWithEndpoints},
 };
-use serde_json::{json, Value};
+use serde_json::Value;
 
 #[tauri::command]
 pub async fn add_listener(
@@ -22,14 +22,12 @@ pub async fn add_listener(
 
     for server_id in server_ids {
         let server = get_server(state.pool.clone(), &server_id).await?;
+
         let password = decrypt(&state.key.read().unwrap(), &server.server.password)?;
-        let client = crate::httpclient::ClientBuilder::new(
-            server.server.username,
-            password,
-            format!("http://{}:{}", server.server.host, server.server.port),
-        )
-        .build()
-        .await?;
+
+        let client = ClientBuilder::new(&server.server)
+            .auth(server.server.username, password)
+            .build()?;
 
         let res = client
             .post_json::<Value, ListenerWithEndpoints>("/listeners", &listener)
@@ -57,13 +55,10 @@ pub async fn start_listener(state: tauri::State<'_, AppState>, id: i64) -> Resul
 
     for server in servers {
         let password = decrypt(&state.key.read().unwrap(), &server.server.password)?;
-        let client = crate::httpclient::ClientBuilder::new(
-            server.server.username,
-            password,
-            format!("http://{}:{}", server.server.host, server.server.port),
-        )
-        .build()
-        .await?;
+
+        let client = ClientBuilder::new(&server.server)
+            .auth(server.server.username, password)
+            .build()?;
 
         let _ = client
             .post::<Value>(&format!("/listeners/{}/start", id))
@@ -79,13 +74,10 @@ pub async fn stop_listener(state: tauri::State<'_, AppState>, id: i64) -> Result
 
     for server in servers {
         let password = decrypt(&state.key.read().unwrap(), &server.server.password)?;
-        let client = crate::httpclient::ClientBuilder::new(
-            server.server.username,
-            password,
-            format!("http://{}:{}", server.server.host, server.server.port),
-        )
-        .build()
-        .await?;
+
+        let client = ClientBuilder::new(&server.server)
+            .auth(server.server.username, password)
+            .build()?;
 
         let _ = client
             .post::<Value>(&format!("/listeners/{}/stop", id))
@@ -96,7 +88,7 @@ pub async fn stop_listener(state: tauri::State<'_, AppState>, id: i64) -> Result
 }
 
 #[tauri::command]
-pub async fn modify_listener(state: tauri::State<'_, AppState>) -> Result<()> {
+pub async fn modify_listener(_state: tauri::State<'_, AppState>) -> Result<()> {
     // TODO: Build out way to modify listener
     Ok(())
 }
@@ -107,13 +99,10 @@ pub async fn remove_listener(state: tauri::State<'_, AppState>, id: i64) -> Resu
 
     for server in servers {
         let password = decrypt(&state.key.read().unwrap(), &server.server.password)?;
-        let client = crate::httpclient::ClientBuilder::new(
-            server.server.username,
-            password,
-            format!("http://{}:{}", server.server.host, server.server.port),
-        )
-        .build()
-        .await?;
+
+        let client = ClientBuilder::new(&server.server)
+            .auth(server.server.username, password)
+            .build()?;
 
         stop_listener(state.clone(), id).await?;
 
