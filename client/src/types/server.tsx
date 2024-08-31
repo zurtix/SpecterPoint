@@ -5,7 +5,7 @@ export interface Server {
   scheme: ServerScheme,
   host: string,
   port: number,
-  log_port: number,
+  event_port: number,
   username: string,
   password: string
 }
@@ -16,7 +16,7 @@ export interface ServerBase {
   scheme: ServerScheme,
   host: string,
   port: number,
-  log_port: number,
+  event_port: number,
   username: string,
   password: string
 }

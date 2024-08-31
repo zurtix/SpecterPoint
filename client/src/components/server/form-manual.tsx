@@ -28,7 +28,7 @@ export function ManualServer({ setOpen }: { setOpen: React.Dispatch<React.SetSta
       scheme: "",
       host: "",
       port: 0,
-      log_port: 0,
+      event_port: 0,
       username: "",
       password: "",
       type: "manual"
@@ -141,7 +141,7 @@ export function ManualServer({ setOpen }: { setOpen: React.Dispatch<React.SetSta
             )}
           />
           <form.Field
-            name="log_port"
+            name="event_port"
             validators={{
               onChangeAsync: z.number()
                 .min(1, "Port range must be between 1-65535")
@@ -151,7 +151,7 @@ export function ManualServer({ setOpen }: { setOpen: React.Dispatch<React.SetSta
             children={(field) => (
               <FormItem
                 field={field}
-                label="Log port">
+                label="Event port">
                 <Input
                   type="number"
                   placeholder="80"

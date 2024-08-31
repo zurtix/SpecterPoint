@@ -2,7 +2,7 @@ use super::Listen;
 use crate::handlers::http;
 use axum::extract::Request;
 use axum::http::StatusCode;
-use axum::middleware::{self, Next};
+use axum::middleware::Next;
 use axum::response::Response;
 use axum::{async_trait, Router};
 use axum_server::Handle;
@@ -37,7 +37,7 @@ impl Listen for HttpListener {
             app = app.merge(http::routes(&e.endpoint));
         }
 
-        app = app.route_layer(middleware::from_fn(scatter_header));
+        // app = app.route_layer(middleware::from_fn(scatter_header));
 
         tokio::spawn(async move {
             axum_server::bind(addr)

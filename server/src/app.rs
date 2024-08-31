@@ -1,19 +1,15 @@
 use crate::orchestrator::Orchestrator;
-use crate::subscriber;
 use crate::{api, auth, models::config::Config};
 use axum_login::{
     login_required,
     tower_sessions::{ExpiredDeletion, Expiry, SessionManagerLayer},
     AuthManagerLayerBuilder,
 };
-use common::db::*;
 use common::models::user::Backend;
+use eventlogs::info;
 use sqlx::SqlitePool;
 use tower_sessions::cookie::{time::Duration, Key};
 use tower_sessions_sqlx_store::SqliteStore;
-use tracing::info;
-
-const DB_URL: &str = "sqlite://specterpoint-server.db";
 
 #[derive(Clone)]
 pub struct App {
@@ -22,19 +18,15 @@ pub struct App {
 }
 
 impl App {
-    pub async fn new() -> Result<Self, common::error::Error> {
-        sqlite::init(DB_URL, Some("./migrations")).await;
-        let pool = sqlite::connect(DB_URL).await;
-
-        Ok(Self {
+    pub fn new(pool: SqlitePool) -> Self {
+        Self {
             orch: Orchestrator::new(pool.clone()),
             pool,
-        })
+        }
     }
 
     pub async fn serve(self) -> Result<(), Box<dyn std::error::Error>> {
         let config = envy::from_env::<Config>().expect("Failed to read environment variables");
-        subscriber::init(&config.host, config.log_port, self.pool.clone()).await;
 
         let session_store = SqliteStore::new(self.pool.clone());
         session_store

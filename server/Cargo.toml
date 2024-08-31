@@ -25,3 +25,4 @@ tower-sessions-sqlx-store = { version = "0.13.0", features = ["sqlite"] }
 tower-sessions = { version = "0.12.2", default-features = false, features = [
   "signed",
 ] }
+eventlogs = { path = "../eventlogs" }

@@ -1,4 +1,5 @@
-use common::models::log::LogMessage;
+use common::models::message::LogMessage;
+use common::models::message::Message;
 use common::models::user::BaseCredential;
 use futures_util::stream::StreamExt;
 use futures_util::SinkExt;
@@ -45,7 +46,7 @@ impl TcpManager {
             if let Ok(socket) = TcpStream::connect(addr).await {
                 let mut framed = Framed::new(socket, LinesCodec::new());
 
-                if let Ok(auth) = serde_json::to_string(&creds) {
+                if let Ok(auth) = serde_json::to_string(&Message::Auth(creds)) {
                     let _ = framed.send(auth).await;
 
                     let _ = handle_clone.emit_all(
@@ -61,8 +62,9 @@ impl TcpManager {
                         tokio::select! {
                             _ = rx.recv() => break,
                             Some(Ok(line)) = framed.next() => {
-                                if let Ok(log) = serde_json::from_str::<LogMessage>(&line) {
-                                    let _ = handle_clone.emit_all("log-event", log);
+                                println!("{:?}", line);
+                                if let Ok(Message::Log(message)) = serde_json::from_str::<Message>(&line) {
+                                    let _ = handle_clone.emit_all("log-event", message);
                                 }
                             }
                         }

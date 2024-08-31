@@ -8,7 +8,7 @@ use crate::{
 pub async fn get_server(pool: SqlitePool, id: &i64) -> Result<Server> {
     Ok(sqlx::query_as(
         r#"
-    SELECT id, name, type, scheme, host, port, log_port, username, password FROM servers WHERE id = ?1
+    SELECT id, name, type, scheme, host, port, event_port, username, password FROM servers WHERE id = ?1
     "#,
     )
     .bind(id)
@@ -19,7 +19,7 @@ pub async fn get_server(pool: SqlitePool, id: &i64) -> Result<Server> {
 pub async fn get_servers(pool: SqlitePool) -> Result<Vec<Server>> {
     Ok(sqlx::query_as(
         r#"
-    SELECT id, name, type, scheme, host, port, log_port, username, password FROM servers
+    SELECT id, name, type, scheme, host, port, event_port, username, password FROM servers
     "#,
     )
     .fetch_all(&pool)
@@ -52,7 +52,7 @@ pub async fn create_server(pool: SqlitePool, server: ServerBase, enc_pass: Strin
     Ok(sqlx::query_scalar(
         r#"
     INSERT INTO servers 
-    (name, type, scheme, host, port, log_port, username, password) 
+    (name, type, scheme, host, port, event_port, username, password) 
     VALUES 
     (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8) 
     RETURNING id;
@@ -63,7 +63,7 @@ pub async fn create_server(pool: SqlitePool, server: ServerBase, enc_pass: Strin
     .bind(&server.scheme)
     .bind(&server.host)
     .bind(server.port)
-    .bind(server.log_port)
+    .bind(server.event_port)
     .bind(&server.username)
     .bind(enc_pass)
     .fetch_one(&pool)

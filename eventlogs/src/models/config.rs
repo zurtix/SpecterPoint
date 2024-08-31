@@ -1,11 +1,11 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Config {
     #[serde(default = "default_host")]
     pub host: String,
     #[serde(default = "default_port")]
-    pub port: u16,
+    pub event_port: u16,
 }
 
 fn default_host() -> String {
@@ -13,5 +13,5 @@ fn default_host() -> String {
 }
 
 fn default_port() -> u16 {
-    8080
+    8081
 }

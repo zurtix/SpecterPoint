@@ -15,7 +15,7 @@ pub struct ServerBase {
     pub scheme: ServerSchemes,
     pub host: String,
     pub port: u16,
-    pub log_port: u16,
+    pub event_port: u16,
     pub username: String,
     pub password: String,
 }

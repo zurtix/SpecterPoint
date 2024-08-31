@@ -3,7 +3,7 @@ use axum::extract::Path;
 use axum::{extract::State, response::IntoResponse, Json};
 use common::error::Result;
 use common::models::listener::ListenerWithEndpoints;
-use tracing::info;
+use eventlogs::info;
 
 pub async fn add_listener(
     State(state): State<App>,

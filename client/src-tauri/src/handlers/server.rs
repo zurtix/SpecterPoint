@@ -25,7 +25,7 @@ pub async fn add_server(
         .add_connection(
             creds,
             id,
-            format!("{}:{}", server.host, server.log_port)
+            format!("{}:{}", server.host, server.event_port)
                 .parse()
                 .unwrap(),
             app_hanle,

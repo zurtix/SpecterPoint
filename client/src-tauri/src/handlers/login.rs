@@ -43,7 +43,7 @@ async fn connect_logs(app_handle: tauri::AppHandle, state: tauri::State<'_, AppS
                 server.id,
                 SocketAddr::from_str(&format!(
                     "{}:{}",
-                    server.server.host, server.server.log_port
+                    server.server.host, server.server.event_port
                 ))
                 .unwrap(),
                 app_handle.clone(),

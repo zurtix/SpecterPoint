@@ -1,7 +1,7 @@
 use axum::Json;
 use common::error::Result;
 use common::models::user::{AuthSession, Credentials};
-use tracing::{error, trace};
+use eventlogs::{error, trace};
 
 pub async fn login(mut auth_session: AuthSession, Json(creds): Json<Credentials>) -> Result<()> {
     trace!("Login attempt for user [{}]", creds.auth.username);

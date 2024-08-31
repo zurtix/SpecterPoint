@@ -5,11 +5,16 @@ mod handlers;
 mod listeners;
 mod models;
 mod orchestrator;
-mod subscriber;
 
 use crate::app::App;
+use common::db::sqlite;
+
+const DB_URL: &str = "sqlite://specterpoint-server.db";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    App::new().await?.serve().await
+    sqlite::init(DB_URL, Some("./migrations")).await;
+    let pool = sqlite::connect(DB_URL).await;
+    eventlogs::communication::init().start(pool.clone()).await;
+    App::new(pool).serve().await
 }

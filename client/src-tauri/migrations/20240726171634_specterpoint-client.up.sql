@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS listeners (
     id INTEGER PRIMARY KEY,
-    "name" TEXT NOT NULL,
+    "name" TEXT NOT NULL
     "host" TEXT NOT NULL,
     port INTEGER NOT NULL,
     "type" TEXT NOT NULL
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS servers (
     "host" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     port INTEGER NOT NULL,
-    log_port INTEGER NOT NULL,
+    event_port INTEGER NOT NULL,
     username TEXT NOT NULL,
     password TEXT NOT NULL
 );
@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS server_listeners (
 );
 
 CREATE TABLE IF NOT EXISTS agents (
-    id INTEGER PRIMARY KEY
+    id INTEGER PRIMARY KEY,
+    alias TEXT
 );
 
 CREATE TABLE IF NOT EXISTS agent_tasks (
