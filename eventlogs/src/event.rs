@@ -20,7 +20,7 @@ use crate::models::{
 
 #[derive(Clone, Default)]
 pub struct EventManager {
-    connections: Arc<Mutex<HashMap<u64, Sender<()>>>>,
+    connections: Arc<Mutex<HashMap<i64, Sender<()>>>>,
 }
 
 impl EventManager {
@@ -67,7 +67,7 @@ impl EventManager {
         });
     }
 
-    pub async fn disconnect(&self, id: &u64) {
+    pub async fn disconnect(&self, id: &i64) {
         if let Some(tx) = self.connections.lock().await.remove(id) {
             let _ = tx.send(()).await;
         }
@@ -79,7 +79,7 @@ pub struct Connection {
     pub username: String,
     pub password: String,
     pub server: String,
-    pub id: u64,
+    pub id: i64,
 }
 
 pub struct ConnectionBuilder {
@@ -87,7 +87,7 @@ pub struct ConnectionBuilder {
     pub username: Option<String>,
     pub password: Option<String>,
     pub server: Option<String>,
-    pub id: Option<u64>,
+    pub id: Option<i64>,
 }
 
 impl ConnectionBuilder {
@@ -112,7 +112,7 @@ impl ConnectionBuilder {
         self
     }
 
-    pub fn id(mut self, id: u64) -> Self {
+    pub fn id(mut self, id: i64) -> Self {
         self.id = Some(id);
         self
     }

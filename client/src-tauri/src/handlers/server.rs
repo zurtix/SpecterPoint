@@ -3,34 +3,25 @@ use common::crypt::aes::encrypt;
 use common::db::server::{create_server, delete_server, get_servers};
 use common::error::Result;
 use common::models::server::{Server, ServerBase};
-use common::models::user::BaseCredential;
+use eventlogs::event::ConnectionBuilder;
 
 #[tauri::command]
 pub async fn add_server(
-    app_hanle: tauri::AppHandle,
+    app_handle: tauri::AppHandle,
     state: tauri::State<'_, AppState>,
     server: ServerBase,
 ) -> Result<()> {
     let encrypted_password = encrypt(&state.key.read().unwrap(), &server.password)?;
 
     let id = create_server(state.pool.clone(), server.clone(), encrypted_password).await?;
+    let host = format!("{}:{}", server.host, server.event_port);
+    let connection = ConnectionBuilder::new(app_handle.clone())
+        .auth(server.username, server.password)
+        .server(host)
+        .id(id)
+        .build();
 
-    let creds = BaseCredential {
-        username: server.username,
-        password: server.password,
-    };
-
-    state
-        .manager
-        .add_connection(
-            creds,
-            id,
-            format!("{}:{}", server.host, server.event_port)
-                .parse()
-                .unwrap(),
-            app_hanle,
-        )
-        .await;
+    state.eventlogs.connect(connection).await;
 
     Ok(())
 }
@@ -38,7 +29,7 @@ pub async fn add_server(
 #[tauri::command]
 pub async fn remove_server(state: tauri::State<'_, AppState>, id: i64) -> Result<()> {
     delete_server(state.pool.clone(), &id).await?;
-    state.manager.remove_connection(id).await;
+    state.eventlogs.disconnect(&id).await;
     Ok(())
 }
 

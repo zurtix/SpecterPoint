@@ -3,11 +3,9 @@
 
 pub mod handlers;
 pub mod httpclient;
-pub mod manager;
 pub mod models;
 
 use common::db::sqlite;
-use manager::TcpManager;
 
 const DB_URL: &str = "sqlite://specterpoint-client.db";
 
@@ -16,8 +14,8 @@ async fn main() {
     sqlite::init(DB_URL, Some("./migrations")).await;
 
     let pool = sqlite::connect(DB_URL).await;
-    let manager = TcpManager::new();
-    let state = models::state::AppState::new(pool, manager);
+    let eventlogs = eventlogs::event::EventManager::new();
+    let state = models::state::AppState::new(pool, eventlogs);
 
     tauri::Builder::default()
         .manage(state)

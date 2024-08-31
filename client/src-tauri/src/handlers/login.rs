@@ -7,6 +7,7 @@ use common::{
     error::Error,
     models::user::{BaseCredential, Credentials, User},
 };
+use eventlogs::event::ConnectionBuilder;
 
 #[tauri::command]
 pub async fn login(
@@ -32,22 +33,15 @@ pub async fn login(
 async fn connect_logs(app_handle: tauri::AppHandle, state: tauri::State<'_, AppState>) {
     let servers = get_servers(state.pool.clone()).await.unwrap();
     for server in servers {
+        let host = format!("{}:{}", server.server.host, server.server.event_port);
         let password = decrypt(&state.key.read().unwrap(), &server.server.password).unwrap();
-        state
-            .manager
-            .add_connection(
-                BaseCredential {
-                    username: server.server.username,
-                    password,
-                },
-                server.id,
-                SocketAddr::from_str(&format!(
-                    "{}:{}",
-                    server.server.host, server.server.event_port
-                ))
-                .unwrap(),
-                app_handle.clone(),
-            )
-            .await;
+
+        let connection = ConnectionBuilder::new(app_handle.clone())
+            .auth(server.server.username, password)
+            .server(host)
+            .id(server.id)
+            .build();
+
+        state.eventlogs.connect(connection).await;
     }
 }
