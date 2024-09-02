@@ -1,7 +1,10 @@
 use axum::http::StatusCode;
-use eventlogs::info;
+use eventlogs::{agent, models::agent::Agent};
 
 pub async fn check_in() -> StatusCode {
-    info!("Agent checking in!");
+    let id = "test".to_string();
+    let agent = Agent { id };
+    agent!(agent);
+
     StatusCode::OK
 }

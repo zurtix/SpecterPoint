@@ -11,7 +11,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Separator } from './ui/separator'
+import { Separator } from '@/components/ui/separator'
 
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
@@ -31,7 +31,7 @@ export function EventViewer() {
 
 
   useEffect(() => {
-    const unlisten = listen<LogMessage>('log-event', (event) => {
+    const unlisten = listen<LogMessage>('event', (event) => {
       if (event.payload.level === "TRACE" && trace
         || event.payload.level === "DEBUG" && debug
         || event.payload.level === "INFO" && info
