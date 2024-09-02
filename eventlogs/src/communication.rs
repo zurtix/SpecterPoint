@@ -3,9 +3,8 @@ use crate::models::{
     message::{Message, MessageCodec},
 };
 use futures_util::SinkExt;
-use once_cell::sync::OnceCell;
 use sqlx::SqlitePool;
-use std::sync::Arc;
+use std::sync::LazyLock;
 use tokio::{
     net::{TcpListener, TcpStream},
     sync::broadcast::{self, Receiver, Sender},
@@ -13,11 +12,7 @@ use tokio::{
 use tokio_stream::StreamExt;
 use tokio_util::codec::Framed;
 
-pub static COMMS: OnceCell<Arc<Communication>> = OnceCell::new();
-
-pub fn init() -> Arc<Communication> {
-    COMMS.get_or_init(|| Arc::new(Communication::new())).clone()
-}
+pub static COMMS: LazyLock<Communication> = LazyLock::new(Communication::new);
 
 #[derive(Clone)]
 pub struct Communication {

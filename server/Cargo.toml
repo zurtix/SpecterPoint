@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 tokio.workspace = true
+tokio-util.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 common.workspace = true
@@ -12,15 +13,13 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 sqlx.workspace = true
 async-trait.workspace = true
+futures-util.workspace = true
+chrono.workspace = true
 axum = { version = "0.7.5", features = ["macros"] }
 axum-server = "0.7.1"
 envy = "0.4.2"
 axum-login = "0.15.3"
-tokio-util = "0.7.11"
-chrono = "0.4.38"
-tracing-core = "0.1.32"
 tokio-stream = "0.1.15"
-futures-util = "0.3.30"
 tower-sessions-sqlx-store = { version = "0.13.0", features = ["sqlite"] }
 tower-sessions = { version = "0.12.2", default-features = false, features = [
   "signed",
