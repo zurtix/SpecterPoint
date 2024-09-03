@@ -83,8 +83,6 @@ export function EventProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-
-
   return (
     <EventProviderContext.Provider value={{
       logs,
