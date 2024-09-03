@@ -2,16 +2,6 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { Log, Agent, Message, Interaction } from "@/types/event"
 import { listen } from "@tauri-apps/api/event"
 
-
-interface EventContextType {
-  logs: Log[]
-  interactions: Interaction[]
-  addInteraction: (id: string, type: string) => void
-  removeInteraction: (id: string, type: string) => void
-  setHistory: (id: string, type: string, history: string[]) => void,
-  setCommand: (id: string, type: string, command: string[]) => void,
-}
-
 const initialLogs: Log[] = []
 const initialInteractions: Interaction[] = []
 const initialEventContext = {
