@@ -7,7 +7,7 @@ pub extern crate chrono;
 #[macro_export]
 macro_rules! send {
     ($msg: ident) => {{
-        $crate::communication::COMMS.send($msg);
+        $crate::communication::instance().send($msg)
     }};
 }
 

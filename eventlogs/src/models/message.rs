@@ -1,9 +1,13 @@
 use serde::{Deserialize, Serialize};
-use tokio_util::codec::{Decoder, Encoder, Framed};
+use tokio_util::{
+    bytes::Buf,
+    codec::{Decoder, Encoder},
+};
 
 use super::{agent::Agent, log::Log};
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum Message {
     Agent(Agent),
     Auth(String, String),
@@ -21,7 +25,6 @@ impl Encoder<Message> for MessageCodec {
     ) -> Result<(), Self::Error> {
         let data = serde_json::to_string(&item)?;
         dst.extend_from_slice(data.as_bytes());
-        dst.extend_from_slice(b"\n");
         Ok(())
     }
 }
@@ -33,8 +36,13 @@ impl Decoder for MessageCodec {
         &mut self,
         src: &mut tokio_util::bytes::BytesMut,
     ) -> Result<Option<Self::Item>, Self::Error> {
+        if src.is_empty() {
+            return Ok(None);
+        }
+
         if let Ok(data) = String::from_utf8(src.to_vec()) {
-            Ok(Some(serde_json::from_str(&data)?))
+            src.advance(data.len());
+            Ok(serde_json::from_str(&data)?)
         } else {
             Ok(None)
         }

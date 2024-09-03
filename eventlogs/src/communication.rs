@@ -22,7 +22,7 @@ pub struct Communication {
 impl Communication {
     fn new() -> Self {
         let (tx, _) = broadcast::channel(100);
-        Self { sender: tx }
+        Self { sender: tx.clone() }
     }
 
     pub async fn start(&self, pool: SqlitePool) {

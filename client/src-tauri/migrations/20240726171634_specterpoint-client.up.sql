@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS listeners (
     id INTEGER PRIMARY KEY,
-    "name" TEXT NOT NULL
+    "name" TEXT NOT NULL,
     "host" TEXT NOT NULL,
     port INTEGER NOT NULL,
     "type" TEXT NOT NULL

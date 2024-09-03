@@ -15,4 +15,5 @@ tokio-stream = "0.1.15"
 rand = "0.8.5"
 tauri = "1.7.2"
 envy = "0.4.2"
+once_cell = "1.19.0"
 common = { path = "../common" }

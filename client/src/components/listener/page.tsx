@@ -20,7 +20,7 @@ export function Listeners() {
   const { toast } = useToast();
 
   useEffect(() => {
-    invoke<Server[]>("all_listeners").then((lstnrs) => (
+    invoke<Listener[]>("all_listeners").then((lstnrs) => (
       setListeners(lstnrs)
     ))
   }, [listeners])

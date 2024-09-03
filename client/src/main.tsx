@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster"
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
+import { EventProvider } from "./components/provider/events";
 
 // Create a new router instance
 const router = createRouter({ routeTree })
@@ -20,9 +21,11 @@ declare module '@tanstack/react-router' {
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
-    <ThemeProvider defaultTheme="dark">
-      <RouterProvider router={router} />
-      <Toaster />
-    </ThemeProvider>
+    <EventProvider>
+      <ThemeProvider defaultTheme="dark">
+        <RouterProvider router={router} />
+        <Toaster />
+      </ThemeProvider>
+    </EventProvider>
   </StrictMode>,
 );

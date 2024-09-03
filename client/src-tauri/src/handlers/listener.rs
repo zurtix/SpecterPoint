@@ -37,6 +37,8 @@ pub async fn add_listener(
         }
     }
 
+    println!("DONE!");
+
     Ok(())
 }
 

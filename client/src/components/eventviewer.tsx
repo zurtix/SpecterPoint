@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Separator } from '@/components/ui/separator'
+import { useEvents } from './provider/events'
 
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
@@ -23,33 +24,18 @@ interface LogMessage {
 
 export function EventViewer() {
 
-  const [lines, setLines] = useState<LogMessage[]>([]);
-  const [trace, setTrace] = useState<Checked>(false);
-  const [debug, setDebug] = useState<Checked>(true);
-  const [info, setInfo] = useState<Checked>(true);
-  const [error, setError] = useState<Checked>(true);
+  const [levels, setLevels] = useState<string[]>(["DEBUG", "INFO", "ERROR"])
+  const events = useEvents()
 
+  function levelChanged(e: boolean, level: string) {
+    if (e && !levels.includes(level)) {
+      setLevels(prev => [...prev, level])
+    }
 
-  useEffect(() => {
-    const unlisten = listen<LogMessage>('event', (event) => {
-      if (event.payload.level === "TRACE" && trace
-        || event.payload.level === "DEBUG" && debug
-        || event.payload.level === "INFO" && info
-        || event.payload.level === "ERROR" && error) {
-        setLines((prevLines) => {
-          const newLines = [...prevLines, event.payload];
-          if (newLines.length > 1000) {
-            newLines.splice(0, newLines.length - 1000);
-          }
-          return newLines;
-        });
-      }
-    });
-
-    return () => {
-      unlisten.then((off) => off());
-    };
-  }, [trace, debug, info, error]);
+    if (!e && levels.includes(level)) {
+      setLevels(prev => prev.filter(p => p != level))
+    }
+  }
 
   return (
     <div className="flex flex-col h-full w-full overflow-hidden">
@@ -63,26 +49,26 @@ export function EventViewer() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">
                 <DropdownMenuCheckboxItem
-                  checked={trace}
-                  onCheckedChange={setTrace}
+                  checked={levels.includes("TRACE")}
+                  onCheckedChange={(e) => levelChanged(e, "TRACE")}
                 >
                   TRACE
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
-                  checked={debug}
-                  onCheckedChange={setDebug}
+                  checked={levels.includes("DEBUG")}
+                  onCheckedChange={(e) => levelChanged(e, "DEBUG")}
                 >
                   DEBUG
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
-                  checked={info}
-                  onCheckedChange={setInfo}
+                  checked={levels.includes("INFO")}
+                  onCheckedChange={(e) => levelChanged(e, "INFO")}
                 >
                   INFO
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
-                  checked={error}
-                  onCheckedChange={setError}
+                  checked={levels.includes("ERROR")}
+                  onCheckedChange={(e) => levelChanged(e, "ERROR")}
                 >
                   ERROR
                 </DropdownMenuCheckboxItem>
@@ -93,7 +79,7 @@ export function EventViewer() {
         <Separator className="text-muted" />
       </div>
       <div className="overflow-y-scroll h-full w-full p-2">
-        {lines.map((line) => (
+        {events.logs.filter(log => levels.includes(log.level)).map(line => (
           <p className="text-xs">
             {format(line.timestamp, "yyyy/MM/dd HH:mm:ss")} : <span className={cn(line.level === "DEBUG" ? "text-green-500" : "", line.level === "ERROR" ? "text-red-500" : "")}>[{line.level}]</span> - {line.message}
           </p>
