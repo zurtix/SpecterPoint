@@ -25,8 +25,8 @@ impl HttpListener {
     pub async fn new(
         host: String,
         port: u16,
-        endpoints: Vec<Endpoint>,
         key: RsaPrivateKey,
+        endpoints: Vec<Endpoint>,
         headers: Vec<Metadata>,
     ) -> Self {
         let addr: SocketAddr = format!("{}:{}", host, port).parse().unwrap();
@@ -111,13 +111,13 @@ async fn header_validate_and_extract(
 
     let aes_key = rsa_decrypted_data[..32].to_vec();
 
-    match req.method() {
-        &Method::GET => {
+    match *req.method() {
+        Method::GET => {
             let data = aes::decrypt_bytes(&aes_key, &rsa_decrypted_data[32..])
                 .map_err(|_| StatusCode::NOT_FOUND);
             req.extensions_mut().insert((aes_key, data));
         }
-        &Method::POST => {
+        Method::POST => {
             req.extensions_mut().insert(aes_key);
         }
         _ => return Err(StatusCode::NOT_FOUND),

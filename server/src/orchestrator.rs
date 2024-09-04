@@ -3,6 +3,8 @@ use crate::listeners::{http::HttpListener, https::HttpsListener, tcp::TcpListene
 use axum::extract::FromRef;
 use common::db::listener::get_listener;
 use common::{error::Result, models::listener::ListenerTypes};
+use rsa::pkcs1::DecodeRsaPrivateKey;
+use rsa::RsaPrivateKey;
 use sqlx::SqlitePool;
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::Mutex;
@@ -29,6 +31,7 @@ impl Orchestrator {
                 HttpListener::new(
                     lstn.listener.listener.host,
                     lstn.listener.listener.port,
+                    RsaPrivateKey::from_pkcs1_pem(&lstn.listener.listener.private_key)?,
                     lstn.endpoints,
                     lstn.metadata,
                 )
