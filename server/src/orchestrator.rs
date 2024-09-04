@@ -30,6 +30,7 @@ impl Orchestrator {
                     lstn.listener.listener.host,
                     lstn.listener.listener.port,
                     lstn.endpoints,
+                    lstn.metadata,
                 )
                 .await,
             ) as Box<dyn Listen + Send>,

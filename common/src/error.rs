@@ -19,6 +19,10 @@ pub enum Error {
     TaskJoin(#[from] tokio::task::JoinError),
     #[error(transparent)]
     Http(#[from] reqwest::Error),
+    #[error(transparent)]
+    Rsa(#[from] rsa::errors::Error),
+    #[error(transparent)]
+    Pkcs1(#[from] rsa::pkcs1::Error),
 }
 
 impl From<aes_gcm::Error> for Error {
@@ -57,7 +61,9 @@ impl IntoResponse for Error {
             | Error::Encrypt(_)
             | Error::Decode(_)
             | Self::TaskJoin(_)
-            | Self::Http(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            | Self::Http(_)
+            | Self::Rsa(_)
+            | Self::Pkcs1(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Error::Auth => StatusCode::UNAUTHORIZED,
         };
 

@@ -15,7 +15,16 @@ CREATE TABLE IF NOT EXISTS listeners (
     "name" TEXT NOT NULL,
     "host" TEXT NOT NULL,
     port INTEGER NOT NULL,
-    "type" TEXT NOT NULL
+    "type" TEXT NOT NULL,
+    private_key TEXT NOT NULL,
+    public_key TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS metadata (
+    id INTEGER PRIMARY KEY,
+    listener_id INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
+    "data" TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS endpoints (

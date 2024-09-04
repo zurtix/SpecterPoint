@@ -12,4 +12,5 @@ tracing-subscriber = "0.3.18"
 async-trait = "0.1.81"
 futures-util = { version = "0.3.30", features = ["sink"] }
 chrono = "0.4.38"
+rsa = "0.9.6"
 common = { path = "./common" }

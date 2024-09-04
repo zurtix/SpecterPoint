@@ -15,11 +15,13 @@ sqlx.workspace = true
 async-trait.workspace = true
 futures-util.workspace = true
 chrono.workspace = true
+rsa.workspace = true
 axum = { version = "0.7.5", features = ["macros"] }
 axum-server = "0.7.1"
 envy = "0.4.2"
 axum-login = "0.15.3"
 tokio-stream = "0.1.15"
+base64 = "0.22.1"
 tower-sessions-sqlx-store = { version = "0.13.0", features = ["sqlite"] }
 tower-sessions = { version = "0.12.2", default-features = false, features = [
   "signed",

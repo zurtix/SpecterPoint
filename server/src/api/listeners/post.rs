@@ -2,12 +2,12 @@ use crate::app::App;
 use axum::extract::Path;
 use axum::{extract::State, response::IntoResponse, Json};
 use common::error::Result;
-use common::models::listener::ListenerWithEndpoints;
+use common::models::listener::ListenerFull;
 use eventlogs::info;
 
 pub async fn add_listener(
     State(state): State<App>,
-    Json(listener): Json<ListenerWithEndpoints>,
+    Json(listener): Json<ListenerFull>,
 ) -> Result<impl IntoResponse> {
     info!("Adding new listener {}", listener.listener.id);
     common::db::listener::add_listener(state.pool, listener).await?;

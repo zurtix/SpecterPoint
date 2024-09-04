@@ -2,12 +2,13 @@ use crate::{
     error::Result,
     models::{
         endpoint::Endpoint,
-        listener::{Listener, ListenerBaseWithEndpoints, ListenerWithEndpoints},
+        listener::{Listener, ListenerBaseFull, ListenerFull},
+        metadata::Metadata,
     },
 };
 use sqlx::{QueryBuilder, Sqlite, SqlitePool};
 
-pub async fn get_listener(pool: SqlitePool, id: &i64) -> Result<ListenerWithEndpoints> {
+pub async fn get_listener(pool: SqlitePool, id: &i64) -> Result<ListenerFull> {
     let listener = sqlx::query_as::<_, Listener>(
         r#"
     SELECT id, name, host, type, port FROM listeners WHERE id = ?1
@@ -26,13 +27,23 @@ pub async fn get_listener(pool: SqlitePool, id: &i64) -> Result<ListenerWithEndp
     .fetch_all(&pool)
     .await?;
 
-    Ok(ListenerWithEndpoints {
+    let metadata = sqlx::query_as::<_, Metadata>(
+        r#"
+    SELECT id, listener_id, name, data FROM metadata WHERE listener_id = ?1
+    "#,
+    )
+    .bind(id)
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(ListenerFull {
         listener,
         endpoints,
+        metadata,
     })
 }
 
-pub async fn get_listseners(pool: SqlitePool) -> Result<Vec<ListenerWithEndpoints>> {
+pub async fn get_listseners(pool: SqlitePool) -> Result<Vec<ListenerFull>> {
     let listeners = sqlx::query_as::<_, Listener>(
         r#"
     SELECT id, name, host, port, type FROM listeners
@@ -43,7 +54,7 @@ pub async fn get_listseners(pool: SqlitePool) -> Result<Vec<ListenerWithEndpoint
 
     let mut listeners_with_endpoints = vec![];
     for base in listeners {
-        let endpoints: Vec<Endpoint> = sqlx::query_as::<_, Endpoint>(
+        let endpoints = sqlx::query_as::<_, Endpoint>(
             r#"
         SELECT id, endpoint WHERE listener_id = ?1
         "#,
@@ -53,9 +64,20 @@ pub async fn get_listseners(pool: SqlitePool) -> Result<Vec<ListenerWithEndpoint
         .await
         .unwrap_or(vec![]);
 
-        listeners_with_endpoints.push(ListenerWithEndpoints {
+        let metadata = sqlx::query_as::<_, Metadata>(
+            r#"
+        SELECT id, listener_id, name, data WHERE listener_id = ?1
+        "#,
+        )
+        .bind(base.id)
+        .fetch_all(&pool)
+        .await
+        .unwrap_or(vec![]);
+
+        listeners_with_endpoints.push(ListenerFull {
             listener: base,
             endpoints,
+            metadata,
         });
     }
 
@@ -72,12 +94,13 @@ pub async fn get_listener_ids(pool: SqlitePool) -> Result<Vec<i64>> {
     .await?)
 }
 
-pub async fn add_listener(pool: SqlitePool, lstn: ListenerWithEndpoints) -> Result<()> {
+pub async fn add_listener(pool: SqlitePool, lstn: ListenerFull) -> Result<()> {
     let mut transaction = pool.begin().await.unwrap();
 
     sqlx::query(
         r#"
-    INSERT INTO listeners (id, name, host, port, type) VALUES (?1, ?2, ?3, ?4, ?5)
+    INSERT INTO listeners (id, name, host, port, type, private_key, public_key) 
+    VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
     "#,
     )
     .bind(lstn.listener.id)
@@ -85,6 +108,8 @@ pub async fn add_listener(pool: SqlitePool, lstn: ListenerWithEndpoints) -> Resu
     .bind(lstn.listener.listener.host)
     .bind(lstn.listener.listener.port)
     .bind(lstn.listener.listener.r#type)
+    .bind(lstn.listener.listener.private_key)
+    .bind(lstn.listener.listener.public_key)
     .execute(&mut *transaction)
     .await?;
 
@@ -107,13 +132,13 @@ pub async fn add_listener(pool: SqlitePool, lstn: ListenerWithEndpoints) -> Resu
     Ok(())
 }
 
-pub async fn create_listener(pool: SqlitePool, create: &ListenerBaseWithEndpoints) -> Result<i64> {
+pub async fn create_listener(pool: SqlitePool, create: &ListenerBaseFull) -> Result<i64> {
     let mut transaction = pool.begin().await?;
 
     let listener_id: i64 = sqlx::query_scalar(
         r#"
-    INSERT INTO listeners (name, host, port, type)
-    VALUES (?1, ?2, ?3, ?4)
+    INSERT INTO listeners (name, host, port, type, private_key, public_key)
+    VALUES (?1, ?2, ?3, ?4, ?5, ?6)
     RETURNING ID
     "#,
     )
@@ -121,6 +146,8 @@ pub async fn create_listener(pool: SqlitePool, create: &ListenerBaseWithEndpoint
     .bind(&create.listener.host)
     .bind(create.listener.port)
     .bind(&create.listener.r#type)
+    .bind(&create.listener.private_key)
+    .bind(&create.listener.public_key)
     .fetch_one(&mut *transaction)
     .await?;
 
@@ -135,6 +162,21 @@ pub async fn create_listener(pool: SqlitePool, create: &ListenerBaseWithEndpoint
         .build()
         .execute(&mut *transaction)
         .await?;
+
+    let mut metadata_query_builder: QueryBuilder<Sqlite> =
+        QueryBuilder::new("INSERT INTO metadata (listener_id, name, data) ");
+
+    metadata_query_builder.push_values(&create.metadata, |mut b, meta| {
+        b.push_bind(listener_id)
+            .push_bind(&meta.name)
+            .push_bind(&meta.data);
+    });
+
+    metadata_query_builder
+        .build()
+        .execute(&mut *transaction)
+        .await?;
+
     transaction.commit().await?;
 
     Ok(listener_id)
@@ -142,6 +184,15 @@ pub async fn create_listener(pool: SqlitePool, create: &ListenerBaseWithEndpoint
 
 pub async fn delete_listener(pool: SqlitePool, id: &i64) -> Result<()> {
     let mut transaction = pool.begin().await.unwrap();
+
+    sqlx::query(
+        r#"
+    DELETE FROM metadata where listener_id = ?1
+    "#,
+    )
+    .bind(id)
+    .execute(&mut *transaction)
+    .await?;
 
     sqlx::query(
         r#"

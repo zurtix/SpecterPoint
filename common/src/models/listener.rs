@@ -1,4 +1,6 @@
 use crate::models::endpoint::Endpoint;
+use crate::models::metadata::Metadata;
+use crate::models::metadata::MetadataBase;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, sqlx::Type)]
@@ -15,6 +17,8 @@ pub struct ListenerBase {
     pub host: String,
     pub port: u16,
     pub r#type: ListenerTypes,
+    pub private_key: String,
+    pub public_key: String,
 }
 
 #[derive(sqlx::FromRow, Debug, Serialize, Deserialize)]
@@ -26,17 +30,19 @@ pub struct Listener {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ListenerWithEndpoints {
+pub struct ListenerFull {
     #[serde(flatten)]
     pub listener: Listener,
     pub endpoints: Vec<Endpoint>,
+    pub metadata: Vec<Metadata>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ListenerBaseWithEndpoints {
+pub struct ListenerBaseFull {
     #[serde(flatten)]
     pub listener: ListenerBase,
     pub endpoints: Vec<String>,
+    pub metadata: Vec<MetadataBase>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

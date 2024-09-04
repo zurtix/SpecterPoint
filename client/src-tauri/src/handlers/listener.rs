@@ -6,14 +6,14 @@ use common::{
         server::{create_server_listeners, get_server, get_server_ids, get_servers},
     },
     error::Result,
-    models::listener::{ListenerBaseWithEndpoints, ListenerWithEndpoints},
+    models::listener::{ListenerBaseFull, ListenerFull},
 };
 use serde_json::Value;
 
 #[tauri::command]
 pub async fn add_listener(
     state: tauri::State<'_, AppState>,
-    create: ListenerBaseWithEndpoints,
+    create: ListenerBaseFull,
 ) -> Result<()> {
     let listener_id = create_listener(state.pool.clone(), &create).await?;
     let server_ids = get_server_ids(state.pool.clone()).await?;
@@ -29,7 +29,7 @@ pub async fn add_listener(
             .build()?;
 
         let res = client
-            .post_json::<Value, ListenerWithEndpoints>("/listeners", &listener)
+            .post_json::<Value, ListenerFull>("/listeners", &listener)
             .await?;
 
         if res.status.is_success() {
@@ -37,15 +37,11 @@ pub async fn add_listener(
         }
     }
 
-    println!("DONE!");
-
     Ok(())
 }
 
 #[tauri::command]
-pub async fn all_listeners(
-    state: tauri::State<'_, AppState>,
-) -> Result<Vec<ListenerWithEndpoints>> {
+pub async fn all_listeners(state: tauri::State<'_, AppState>) -> Result<Vec<ListenerFull>> {
     get_listseners(state.pool.clone()).await
 }
 

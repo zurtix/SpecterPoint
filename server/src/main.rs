@@ -8,7 +8,6 @@ mod orchestrator;
 
 use crate::app::App;
 use common::db::sqlite;
-use tokio::sync::broadcast;
 
 const DB_URL: &str = "sqlite://specterpoint-server.db";
 

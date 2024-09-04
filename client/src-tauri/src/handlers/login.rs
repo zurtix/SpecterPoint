@@ -1,11 +1,9 @@
-use std::{net::SocketAddr, str::FromStr};
-
 use crate::models::state::AppState;
 use common::{
     crypt::{aes::decrypt, hash::verify_password_hash},
     db::{server::get_servers, user::get_user},
     error::Error,
-    models::user::{BaseCredential, Credentials, User},
+    models::user::{Credentials, User},
 };
 use eventlogs::event::ConnectionBuilder;
 

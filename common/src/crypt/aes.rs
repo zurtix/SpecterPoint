@@ -1,11 +1,11 @@
-use crate::error::Error;
+use crate::error::Result;
 use aes_gcm::{
     aead::{generic_array::GenericArray, Aead, AeadCore, KeyInit},
     Aes256Gcm, Key,
 };
 use hex::{decode, encode};
 
-pub fn encrypt(key: &str, data: &str) -> Result<String, Error> {
+pub fn encrypt(key: &str, data: &str) -> Result<String> {
     let k = Key::<Aes256Gcm>::from_slice(key.as_bytes());
     let nonce = Aes256Gcm::generate_nonce(&mut aes_gcm::aead::OsRng);
     let cipher = Aes256Gcm::new(k);
@@ -14,9 +14,19 @@ pub fn encrypt(key: &str, data: &str) -> Result<String, Error> {
     Ok(encode([nonce.to_vec(), ciphertext].concat()))
 }
 
-pub fn decrypt(key: &str, encodedtext: &str) -> Result<String, Error> {
+pub fn decrypt(key: &str, encodedtext: &str) -> Result<String> {
     let ciphertext = decode(encodedtext)?;
     let k = Key::<Aes256Gcm>::from_slice(key.as_bytes());
+    let nonce = GenericArray::from_slice(&ciphertext[..12]);
+    let cipher = Aes256Gcm::new(k);
+    let text = cipher.decrypt(nonce, &ciphertext[12..])?;
+
+    Ok(String::from_utf8_lossy(text.as_slice()).to_string())
+}
+
+pub fn decrypt_bytes(key: &[u8], encodedbytes: &[u8]) -> Result<String> {
+    let ciphertext = decode(encodedbytes)?;
+    let k = Key::<Aes256Gcm>::from_slice(key);
     let nonce = GenericArray::from_slice(&ciphertext[..12]);
     let cipher = Aes256Gcm::new(k);
     let text = cipher.decrypt(nonce, &ciphertext[12..])?;

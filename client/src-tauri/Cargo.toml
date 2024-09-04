@@ -21,8 +21,10 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 futures-util.workspace = true
 chrono.workspace = true
+rsa.workspace = true
 tauri = { version = "1", features = ["shell-open"] }
 reqwest = { version = "0.12.7", features = ["json", "cookies"] }
+rand = "0.8.5"
 eventlogs = { path = "../../eventlogs" }
 
 [features]
