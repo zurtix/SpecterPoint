@@ -6,12 +6,17 @@ use crate::{
         metadata::Metadata,
     },
 };
-use sqlx::{QueryBuilder, Sqlite, SqlitePool};
+use sqlx::SqlitePool;
+
+use super::{
+    endpoint::{add_endpoints, create_endpoints},
+    metadata::{add_metadata, create_metadata},
+};
 
 pub async fn get_listener(pool: SqlitePool, id: &i64) -> Result<ListenerFull> {
     let listener = sqlx::query_as::<_, Listener>(
         r#"
-    SELECT id, name, host, type, port FROM listeners WHERE id = ?1
+    SELECT id, name, host, type, port, private_key, public_key FROM listeners WHERE id = ?1
     "#,
     )
     .bind(id)
@@ -46,7 +51,7 @@ pub async fn get_listener(pool: SqlitePool, id: &i64) -> Result<ListenerFull> {
 pub async fn get_listseners(pool: SqlitePool) -> Result<Vec<ListenerFull>> {
     let listeners = sqlx::query_as::<_, Listener>(
         r#"
-    SELECT id, name, host, port, type FROM listeners
+    SELECT id, name, host, port, type, private_key, public_key FROM listeners
     "#,
     )
     .fetch_all(&pool)
@@ -113,19 +118,8 @@ pub async fn add_listener(pool: SqlitePool, lstn: ListenerFull) -> Result<()> {
     .execute(&mut *transaction)
     .await?;
 
-    let mut endpoint_query_builder: QueryBuilder<Sqlite> =
-        QueryBuilder::new("INSERT INTO endpoints (id, listener_id, endpoint) ");
-
-    endpoint_query_builder.push_values(lstn.endpoints, |mut b, endpoint| {
-        b.push_bind(endpoint.id)
-            .push_bind(lstn.listener.id)
-            .push_bind(endpoint.endpoint);
-    });
-
-    endpoint_query_builder
-        .build()
-        .execute(&mut *transaction)
-        .await?;
+    add_endpoints(lstn.endpoints, &mut transaction).await?;
+    add_metadata(lstn.metadata, &mut transaction).await?;
 
     transaction.commit().await?;
 
@@ -151,31 +145,8 @@ pub async fn create_listener(pool: SqlitePool, create: &ListenerBaseFull) -> Res
     .fetch_one(&mut *transaction)
     .await?;
 
-    let mut endpoint_query_builder: QueryBuilder<Sqlite> =
-        QueryBuilder::new("INSERT INTO endpoints (listener_id, endpoint) ");
-
-    endpoint_query_builder.push_values(&create.endpoints, |mut b, endpoint| {
-        b.push_bind(listener_id).push_bind(endpoint);
-    });
-
-    endpoint_query_builder
-        .build()
-        .execute(&mut *transaction)
-        .await?;
-
-    let mut metadata_query_builder: QueryBuilder<Sqlite> =
-        QueryBuilder::new("INSERT INTO metadata (listener_id, name, data) ");
-
-    metadata_query_builder.push_values(&create.metadata, |mut b, meta| {
-        b.push_bind(listener_id)
-            .push_bind(&meta.name)
-            .push_bind(&meta.data);
-    });
-
-    metadata_query_builder
-        .build()
-        .execute(&mut *transaction)
-        .await?;
+    create_endpoints(listener_id, create.endpoints.clone(), &mut transaction).await?;
+    create_metadata(listener_id, create.metadata.clone(), &mut transaction).await?;
 
     transaction.commit().await?;
 

@@ -25,7 +25,6 @@ impl Orchestrator {
 
     pub async fn start_listener(self, id: &i64) -> Result<()> {
         let lstn = get_listener(self.pool, id).await?;
-
         let listener: Box<dyn Listen + Send> = match lstn.listener.listener.r#type {
             ListenerTypes::Http => Box::new(
                 HttpListener::new(

@@ -94,8 +94,7 @@ async fn header_validate_and_extract(
         .get(axum::http::header::AUTHORIZATION)
         .and_then(|header| header.to_str().ok())
         .and_then(|s| s.strip_prefix("Bearer "))
-        .unwrap_or("")
-        .as_bytes();
+        .unwrap_or("");
 
     if encoded_data.is_empty() {
         return Err(StatusCode::NOT_FOUND);
@@ -105,20 +104,19 @@ async fn header_validate_and_extract(
         .decode(encoded_data)
         .map_err(|_| StatusCode::NOT_FOUND)?;
 
-    let rsa_decrypted_data = key
+    let raw = key
         .decrypt(Pkcs1v15Encrypt, &encrypted_data)
-        .map_err(|_| StatusCode::NOT_FOUND)?;
-
-    let aes_key = rsa_decrypted_data[..32].to_vec();
+        .map_err(|_| StatusCode::NOT_FOUND)?
+        .to_vec();
 
     match *req.method() {
         Method::GET => {
-            let data = aes::decrypt_bytes(&aes_key, &rsa_decrypted_data[32..])
-                .map_err(|_| StatusCode::NOT_FOUND);
-            req.extensions_mut().insert((aes_key, data));
+            let agent =
+                aes::decrypt_bytes(&raw[..32], &raw[32..]).map_err(|_| StatusCode::NOT_FOUND)?;
+            req.extensions_mut().insert(agent);
         }
         Method::POST => {
-            req.extensions_mut().insert(aes_key);
+            req.extensions_mut().insert(raw[..32].to_vec());
         }
         _ => return Err(StatusCode::NOT_FOUND),
     }

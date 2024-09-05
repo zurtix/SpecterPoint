@@ -60,7 +60,7 @@ impl EventManager {
                         _ = rx.recv() =>  break,
                         Some(Ok(message)) = framed.next() => {
                             let _ = connection.handle.emit_all("event", message);
-                         }
+                        }
                     }
                 }
             }
