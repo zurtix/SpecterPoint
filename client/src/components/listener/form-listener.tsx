@@ -68,7 +68,6 @@ export default function ({ setOpen }:
     invoke<[string, string]>("generate_keys").then(keys => {
       setKeys(keys)
       setPending(false)
-      console.log(keys)
     }).catch((err) => (
       toast({
         variant: "destructive",
