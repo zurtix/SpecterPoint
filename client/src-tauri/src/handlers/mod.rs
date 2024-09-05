@@ -24,6 +24,8 @@ pub fn make_handlers() -> impl Fn(tauri::Invoke<tauri::Wry>) {
         listener::remove_listener,
         listener::start_listener,
         listener::stop_listener,
+        agent::check_agent,
+        agent::agents,
         login::login,
         user::user_create,
         quit

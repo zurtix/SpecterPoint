@@ -1,6 +1,6 @@
 use crate::models::metadata::Metadata;
 use crate::{error::Result, models::metadata::MetadataBase};
-use sqlx::{QueryBuilder, Sqlite, Transaction};
+use sqlx::{QueryBuilder, Sqlite, SqlitePool, Transaction};
 
 pub async fn add_metadata(
     data: Vec<Metadata>,
@@ -46,6 +46,34 @@ pub async fn create_metadata(
             .execute(&mut **transaction)
             .await?;
     }
+
+    Ok(())
+}
+
+pub async fn get_metadata(listener_id: i64, pool: SqlitePool) -> Vec<Metadata> {
+    sqlx::query_as(
+        r#"
+        SELECT id, listener_id, name, data FROM metadata WHERE listener_id = ?1
+        "#,
+    )
+    .bind(listener_id)
+    .fetch_all(&pool)
+    .await
+    .unwrap_or(vec![])
+}
+
+pub async fn delete_metadata(
+    listener_id: i64,
+    transaction: &mut Transaction<'_, Sqlite>,
+) -> Result<()> {
+    sqlx::query(
+        r#"
+    DELETE FROM metadata where listener_id = ?1
+    "#,
+    )
+    .bind(listener_id)
+    .execute(&mut **transaction)
+    .await?;
 
     Ok(())
 }

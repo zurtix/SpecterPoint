@@ -28,15 +28,15 @@ export default function ({ setOpen }:
   const [metadata, setMetadata] = useState<string>("")
   const [viewKeys, setViewKeys] = useState(false)
   const [pending, setPending] = useState(true)
-  const [keys, setKeys] = useState<[string, string]>(["", ""])
+  const [keys, setKeys] = useState<[string, string]>()
   const form = useForm({
     defaultValues: {
       type: "",
       name: "",
       host: "",
       port: 0,
-      private_key: keys[0],
-      public_key: keys[1],
+      private_key: "",
+      public_key: "",
       endpoints: [],
       metadata: []
     },
@@ -60,7 +60,9 @@ export default function ({ setOpen }:
   })
 
   useEffect(() => {
-    generateKeys()
+    if (!keys) {
+      generateKeys()
+    }
   }, [])
 
   function generateKeys() {
@@ -74,9 +76,7 @@ export default function ({ setOpen }:
         title: "Failed to generate keys",
         description: err,
       })
-
     ))
-
   }
 
   function handleEndpoint() {
@@ -136,7 +136,8 @@ export default function ({ setOpen }:
                     rows={10}
                     id={field.name}
                     name={field.name}
-                    value={field.state.value}
+                    value={keys![0]}
+                    defaultValue={keys![0]}
                     onChange={(e) => field.handleChange(e.currentTarget.value)} />
                 </FormItem>
               )}
@@ -149,7 +150,8 @@ export default function ({ setOpen }:
                     rows={10}
                     id={field.name}
                     name={field.name}
-                    value={field.state.value}
+                    value={keys![1]}
+                    defaultValue={keys![1]}
                     onChange={(e) => field.handleChange(e.currentTarget.value)} />
                 </FormItem>
               )}

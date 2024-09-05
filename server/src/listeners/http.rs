@@ -111,9 +111,9 @@ async fn header_validate_and_extract(
 
     match *req.method() {
         Method::GET => {
-            let agent =
+            let id =
                 aes::decrypt_bytes(&raw[..32], &raw[32..]).map_err(|_| StatusCode::NOT_FOUND)?;
-            req.extensions_mut().insert(agent);
+            req.extensions_mut().insert(id);
         }
         Method::POST => {
             req.extensions_mut().insert(raw[..32].to_vec());

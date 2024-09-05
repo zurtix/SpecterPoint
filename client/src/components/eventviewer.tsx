@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react'
-import { listen } from '@tauri-apps/api/event'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
 import { Label } from '@/components/ui/label'
 import { Button } from "@/components/ui/button"
 import { format } from 'date-fns'
@@ -14,13 +12,6 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { useEvents } from './provider/events'
 
-type Checked = DropdownMenuCheckboxItemProps["checked"]
-
-interface LogMessage {
-  timestamp: string,
-  level: string,
-  message: string
-}
 
 export function EventViewer() {
 
@@ -79,12 +70,12 @@ export function EventViewer() {
         <Separator className="text-muted" />
       </div>
       <div className="overflow-y-scroll h-full w-full p-2">
-        {events.logs.filter(log => levels.includes(log.level)).map(line => (
-          <p className="text-xs">
+        {events.logs.filter(log => levels.includes(log.level)).map((line, idx) => (
+          <p key={`${idx}`} className="text-xs" >
             {format(line.timestamp, "yyyy/MM/dd HH:mm:ss")} : <span className={cn(line.level === "DEBUG" ? "text-green-500" : "", line.level === "ERROR" ? "text-red-500" : "")}>[{line.level}]</span> - {line.message}
           </p>
         ))}
       </div>
-    </div>
+    </div >
   )
 }

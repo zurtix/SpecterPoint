@@ -65,9 +65,9 @@ macro_rules! error {
 }
 
 #[macro_export]
-macro_rules! agent {
+macro_rules! checkin {
     ($agent:expr) => {{
-        let msg = $crate::models::message::Message::Agent($agent);
+        let msg = $crate::models::message::Message::Checkin($agent);
         $crate::send!(msg);
     }};
 }

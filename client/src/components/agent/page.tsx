@@ -13,11 +13,20 @@ import Terminal from '@/components/ui/terminal'
 import { AgentItem } from "@/components/agent/item"
 import { XIcon } from "lucide-react"
 import { useEvents } from "../provider/events"
-
-const agents = ["5ed36b39", "test"]
+import { useEffect, useState } from "react"
+import { invoke } from "@tauri-apps/api/tauri"
+import { Agent } from "@/types/agent"
 
 export function Agents() {
   const events = useEvents();
+
+  const [agents, setAgents] = useState<Agent[]>([])
+
+  useEffect(() => {
+
+    invoke<Agent[]>("agents").then(data => setAgents(data)).catch(err => console.log(err))
+    setTimeout(() => { }, 1000)
+  }, [agents])
 
   function onMiddleClick(e: number, id: string, type: string) {
     if (e === 1) {
@@ -30,7 +39,7 @@ export function Agents() {
       direction="horizontal">
       <ResizablePanel defaultSize={10} minSize={17}>
         <div className="flex flex-col p-2 text-sm h-full overflow-y-scroll gap-2">
-          {agents.map(id => <AgentItem id={id} onInteract={events.addInteraction} />)}
+          {agents.map(a => <AgentItem agent={a} onInteract={events.addInteraction} />)}
         </div>
       </ResizablePanel>
       <ResizableHandle />

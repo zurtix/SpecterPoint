@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS server_listeners (
 );
 
 CREATE TABLE IF NOT EXISTS agents (
-    id INTEGER PRIMARY KEY,
-    alias TEXT
+    id TEXT NOT NULL,
+    last_seen TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS agent_tasks (

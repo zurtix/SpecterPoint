@@ -11,7 +11,8 @@ use super::{agent::Agent, log::Log};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Message {
-    Agent(Agent),
+    Checkin(Agent),
+    //Data(),
     Auth(String, String),
     Log(Log),
 }

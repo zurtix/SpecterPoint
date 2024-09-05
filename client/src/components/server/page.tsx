@@ -9,7 +9,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { Server } from "@/components/server/types"
+import { Server } from "@/types/server"
 import { invoke } from "@tauri-apps/api/tauri"
 import { useToast } from "../ui/use-toast"
 
@@ -22,6 +22,8 @@ export function Servers() {
     invoke<Server[]>("all_servers").then((srvs) => (
       setServers(srvs)
     ))
+
+    setTimeout(() => { }, 1000)
   }, [servers])
 
   function remove(id: number) {

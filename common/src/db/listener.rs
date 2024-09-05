@@ -9,8 +9,8 @@ use crate::{
 use sqlx::SqlitePool;
 
 use super::{
-    endpoint::{add_endpoints, create_endpoints},
-    metadata::{add_metadata, create_metadata},
+    endpoint::{add_endpoints, create_endpoints, delete_endpoints, get_endpoints},
+    metadata::{add_metadata, create_metadata, delete_metadata, get_metadata},
 };
 
 pub async fn get_listener(pool: SqlitePool, id: &i64) -> Result<ListenerFull> {
@@ -57,36 +57,18 @@ pub async fn get_listseners(pool: SqlitePool) -> Result<Vec<ListenerFull>> {
     .fetch_all(&pool)
     .await?;
 
-    let mut listeners_with_endpoints = vec![];
+    let mut listeners_full = vec![];
     for base in listeners {
-        let endpoints = sqlx::query_as::<_, Endpoint>(
-            r#"
-        SELECT id, endpoint WHERE listener_id = ?1
-        "#,
-        )
-        .bind(base.id)
-        .fetch_all(&pool)
-        .await
-        .unwrap_or(vec![]);
-
-        let metadata = sqlx::query_as::<_, Metadata>(
-            r#"
-        SELECT id, listener_id, name, data WHERE listener_id = ?1
-        "#,
-        )
-        .bind(base.id)
-        .fetch_all(&pool)
-        .await
-        .unwrap_or(vec![]);
-
-        listeners_with_endpoints.push(ListenerFull {
+        let endpoints = get_endpoints(base.id, pool.clone()).await;
+        let metadata = get_metadata(base.id, pool.clone()).await;
+        listeners_full.push(ListenerFull {
             listener: base,
             endpoints,
             metadata,
         });
     }
 
-    Ok(listeners_with_endpoints)
+    Ok(listeners_full)
 }
 
 pub async fn get_listener_ids(pool: SqlitePool) -> Result<Vec<i64>> {
@@ -153,26 +135,11 @@ pub async fn create_listener(pool: SqlitePool, create: &ListenerBaseFull) -> Res
     Ok(listener_id)
 }
 
-pub async fn delete_listener(pool: SqlitePool, id: &i64) -> Result<()> {
+pub async fn delete_listener(pool: SqlitePool, id: i64) -> Result<()> {
     let mut transaction = pool.begin().await.unwrap();
 
-    sqlx::query(
-        r#"
-    DELETE FROM metadata where listener_id = ?1
-    "#,
-    )
-    .bind(id)
-    .execute(&mut *transaction)
-    .await?;
-
-    sqlx::query(
-        r#"
-    DELETE FROM endpoints where listener_id = ?1
-    "#,
-    )
-    .bind(id)
-    .execute(&mut *transaction)
-    .await?;
+    delete_metadata(id, &mut transaction).await?;
+    delete_endpoints(id, &mut transaction).await?;
 
     sqlx::query(
         r#"

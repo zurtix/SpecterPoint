@@ -107,7 +107,7 @@ pub async fn remove_listener(state: tauri::State<'_, AppState>, id: i64) -> Resu
             .await?;
     }
 
-    delete_listener(state.pool.clone(), &id).await?;
+    delete_listener(state.pool.clone(), id).await?;
 
     Ok(())
 }

@@ -12,4 +12,5 @@ rsa = "0.9.6"
 pem = "3.0.4"
 base64 = "0.22.1"
 reqwest = "0.12.7"
+chrono = "0.4.38"
 common = { path = "../common" }

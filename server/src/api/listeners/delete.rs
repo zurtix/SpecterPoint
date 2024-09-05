@@ -9,6 +9,6 @@ pub async fn delete_listener(
     Path(id): Path<i64>,
 ) -> Result<impl IntoResponse> {
     debug!("Deleting listener.");
-    common::db::listener::delete_listener(state.pool, &id).await?;
+    common::db::listener::delete_listener(state.pool, id).await?;
     Ok(Json(""))
 }

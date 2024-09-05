@@ -9,7 +9,6 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { Server } from "@/types/server"
 import { invoke } from "@tauri-apps/api/tauri"
 import { useToast } from "../ui/use-toast"
 import { Listener } from "@/types/listener"
@@ -22,7 +21,9 @@ export function Listeners() {
   useEffect(() => {
     invoke<Listener[]>("all_listeners").then((lstnrs) => (
       setListeners(lstnrs)
-    ))
+    )).catch(err => console.log(err))
+
+    setTimeout(() => { }, 1000)
   }, [listeners])
 
 
@@ -49,7 +50,7 @@ export function Listeners() {
   }
 
   return (
-    <ResizablePanelGroup direction="horizontal">
+    <ResizablePanelGroup direction="horizontal" className="overflow-y-scroll">
       <ResizablePanel defaultSize={25}>
         <div className="flex flex-col p-2">
           <Input
@@ -73,7 +74,7 @@ export function Listeners() {
         </div>
       </ResizablePanel>
       <ResizableHandle />
-      <ResizablePanel defaultSize={75}>
+      <ResizablePanel defaultSize={75} className="!overflow-y-scroll">
         <ListenerView listener={listener} remove={remove} />
       </ResizablePanel>
     </ResizablePanelGroup>

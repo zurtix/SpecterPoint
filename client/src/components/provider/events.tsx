@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { Log, Agent, Message, Interaction } from "@/types/event"
 import { listen } from "@tauri-apps/api/event"
+import { invoke } from "@tauri-apps/api/tauri"
 
 const initialLogs: Log[] = []
 const initialInteractions: Interaction[] = []
@@ -23,7 +24,7 @@ export function EventProvider({ children }: { children: React.ReactNode }) {
     const unlisten = listen<Message>('event', (event) => {
       if (event.payload.log) {
         setLogs(prev => {
-          let messages = [...prev, event.payload.log]
+          let messages = [...prev, event.payload.log as Log]
           if (messages.length > 1000) {
             messages = messages.slice(0, messages.length - 1000)
           }
@@ -31,9 +32,9 @@ export function EventProvider({ children }: { children: React.ReactNode }) {
         })
       }
 
-      if (event.payload.agent) {
-        console.log("AGENT COMMS TO BE IMPLEMENTED")
-        console.log(event.payload.agent)
+      if (event.payload.checkin) {
+        console.log(event.payload.checkin)
+        invoke("check_agent", { agent: event.payload.checkin }).catch((err) => console.log(err))
       }
     });
 

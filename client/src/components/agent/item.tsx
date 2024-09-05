@@ -8,12 +8,14 @@ import {
   Card, CardContent
 } from "@/components/ui/card"
 import { Badge } from "../ui/badge"
+import { Agent } from "@/types/agent"
+import { format } from "date-fns"
 
-export function AgentItem({ id, onInteract }: { id: string, onInteract: (id: string, type: string) => void }) {
+export function AgentItem({ agent, onInteract }: { agent: Agent, onInteract: (id: string, type: string) => void }) {
 
   function handleDouble(e: React.MouseEvent<HTMLDivElement>) {
     if (e.detail === 2) {
-      onInteract(id, "command")
+      onInteract(agent.id, "command")
     }
   }
 
@@ -23,16 +25,16 @@ export function AgentItem({ id, onInteract }: { id: string, onInteract: (id: str
         <Card className="cursor-pointer selecter-none" onClick={handleDouble}>
           <CardContent className="w-full p-2 text-center">
             <div>
-              <p className="font-bold select-none">{id}</p>
+              <p className="font-bold select-none">{agent.id}</p>
               <div>
-                <Badge className="bg-secondary text-muted-foreground select-none" variant="outline">2024-01-01 08:00</Badge>
+                <Badge className="bg-secondary text-muted-foreground select-none" variant="outline">{format(agent.last_seen, "yyy-MM-dd HH:mm:ss")}</Badge>
               </div>
             </div>
           </CardContent>
         </Card>
       </ContextMenuTrigger>
       <ContextMenuContent>
-        <ContextMenuItem onClick={() => onInteract(id, "command")}>
+        <ContextMenuItem onClick={() => onInteract(agent.id, "command")}>
           Interact
         </ContextMenuItem>
         <ContextMenuItem>
@@ -41,7 +43,7 @@ export function AgentItem({ id, onInteract }: { id: string, onInteract: (id: str
         <ContextMenuItem>
           Update
         </ContextMenuItem>
-        <ContextMenuItem onClick={() => onInteract(id, "shell")}>
+        <ContextMenuItem onClick={() => onInteract(agent.id, "shell")}>
           Remote Shell
         </ContextMenuItem>
       </ContextMenuContent>

@@ -4,7 +4,7 @@ use rand::{distributions::Alphanumeric, Rng};
 use rsa::{pkcs1::DecodeRsaPublicKey, Pkcs1v15Encrypt, RsaPublicKey};
 
 const PUBLIC_RSA_KEY: &str = r#"
-PLACE LISTENER PUB RSA KEY HERE
+PUBLIC RSA KEY FOR LISTENER
 "#;
 
 fn encrypt(message: &str) -> String {
@@ -28,7 +28,13 @@ fn encrypt(message: &str) -> String {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let fake_bearer = encrypt(r#"{"agent": {"id": "for testing"}}"#);
+    let agent_id: String = rand::thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(12)
+        .map(char::from)
+        .collect();
+
+    let fake_bearer = encrypt(&agent_id);
     let client = reqwest::Client::new();
 
     let res = client

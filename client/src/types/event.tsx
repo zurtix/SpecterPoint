@@ -6,12 +6,12 @@ export type Log = {
 
 export type Agent = {
   id: string,
-  type: string
+  last_seen: string
 }
 
 export interface Message {
-  log: Log,
-  agent: Agent
+  log?: Log,
+  checkin?: Agent
 }
 
 export interface Interaction {
