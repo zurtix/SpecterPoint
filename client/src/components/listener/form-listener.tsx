@@ -14,12 +14,14 @@ import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
 import { invoke } from "@tauri-apps/api/tauri"
 import { Badge } from "@/components/ui/badge"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { ListenerTypes } from "@/types/listener"
 import { Key, RefreshCw } from "lucide-react"
 import { ResponsiveDialog } from "../ui/responsive-dialog"
 import { Textarea } from "../ui/textarea"
 import { Spinner } from "../ui/spinner"
+import { Label } from "../ui/label"
+import { Checkbox } from "../ui/checkbox"
 
 export default function ({ setOpen }:
   { setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
@@ -27,8 +29,11 @@ export default function ({ setOpen }:
   const [endpoint, setEndpoint] = useState<string>("")
   const [metadata, setMetadata] = useState<string>("")
   const [viewKeys, setViewKeys] = useState(false)
-  const [pending, setPending] = useState(true)
-  const [keys, setKeys] = useState<[string, string]>()
+  const [pending, setPending] = useState(false)
+  const [pubkey, setPubkey] = useState("")
+  const [privkey, setPrivkey] = useState("")
+  const [genkey, setGenkey] = useState(false)
+
   const form = useForm({
     defaultValues: {
       type: "",
@@ -41,6 +46,9 @@ export default function ({ setOpen }:
       metadata: []
     },
     onSubmit: async ({ value }) => {
+      value.private_key = privkey
+      value.public_key = pubkey
+
       invoke("add_listener", { create: value }).then((_) => {
         setOpen(false);
         toast({
@@ -59,16 +67,11 @@ export default function ({ setOpen }:
     validatorAdapter: zodValidator()
   })
 
-  useEffect(() => {
-    if (!keys) {
-      generateKeys()
-    }
-  }, [])
-
   function generateKeys() {
     setPending(true)
     invoke<[string, string]>("generate_keys").then(keys => {
-      setKeys(keys)
+      setPrivkey(keys[0])
+      setPubkey(keys[1])
       setPending(false)
     }).catch((err) => (
       toast({
@@ -127,41 +130,31 @@ export default function ({ setOpen }:
           setIsOpen={setViewKeys}
           title="RSA Key pairs"
           description="Below are default key pairs that can be overriden">
-          <div className="flex flex-col">
-            <form.Field
+          <div className="flex flex-col gap-2">
+            <Label>Private Key</Label>
+            <Textarea
+              rows={10}
+              id="private_key"
               name="private_key"
-              children={(field) => (
-                <FormItem field={field} label="Prviate Key">
-                  <Textarea
-                    rows={10}
-                    id={field.name}
-                    name={field.name}
-                    value={keys![0]}
-                    defaultValue={keys![0]}
-                    onChange={(e) => field.handleChange(e.currentTarget.value)} />
-                </FormItem>
-              )}
-            />
-            <form.Field
+              value={privkey}
+              placeholder={"-----BEGIN RSA PRIVATE KEY-----\n....\n-----END RSA PRIVATE KEY-----"}
+              onChange={(e) => setPrivkey(e.currentTarget.value)} />
+            <Label>Public Key</Label>
+            <Textarea
+              rows={10}
+              id="public_key"
               name="public_key"
-              children={(field) => (
-                <FormItem field={field} label="Public Key">
-                  <Textarea
-                    rows={10}
-                    id={field.name}
-                    name={field.name}
-                    value={keys![1]}
-                    defaultValue={keys![1]}
-                    onChange={(e) => field.handleChange(e.currentTarget.value)} />
-                </FormItem>
-              )}
-            />
+              value={pubkey}
+              placeholder={"-----BEGIN RSA PUBLIC KEY-----\n....\n-----END RSA PUBLIC KEY-----"}
+              onChange={(e) => setPubkey(e.currentTarget.value)} />
             <div className="flex gap-2">
-              <Button type="button" onClick={() => setViewKeys(false)}>Close</Button>
-              <Button type="button" disabled={pending} variant="secondary" onClick={() => generateKeys()}>
+              <Button type="button" disabled={pending} onClick={() => setViewKeys(false)}>Close</Button>
+              <Button type="button" disabled={pending} variant="secondary" onClick={() => {
+                setGenkey(true)
+                generateKeys()
+              }}>
                 {pending ? <Spinner /> : <RefreshCw />}
               </Button>
-
             </div>
           </div>
         </ResponsiveDialog>
@@ -317,9 +310,16 @@ export default function ({ setOpen }:
               )}
             />
           </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox id="genkey" checked={genkey} onCheckedChange={(e) => {
+              setGenkey(e === true)
+              generateKeys()
+            }} />
+            <Label htmlFor="genkey">Generate key?</Label>
+          </div>
         </div>
         <div className="flex gap-2 mt-4">
-          <Button type="submit">Submit</Button>
+          <Button disabled={pending} type="submit">Submit</Button>
           <Button type="button" disabled={pending} variant="secondary" onClick={() => setViewKeys(true)}>
             {pending ? <Spinner /> :
               <div className="flex gap-2">
@@ -328,6 +328,6 @@ export default function ({ setOpen }:
           </Button>
         </div>
       </div>
-    </form>
+    </form >
   )
 }

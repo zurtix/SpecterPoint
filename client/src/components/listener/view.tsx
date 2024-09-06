@@ -56,13 +56,13 @@ export function ListenerView({ listener, remove }: { listener?: Listener, remove
         <div className="flex flex-col gap-2">
           <Label className="font-bold">Endpoints</Label>
           <div className="flex">
-            {listener.endpoints.map(endpoint => (<Badge>{endpoint.endpoint}</Badge>))}
+            {listener.endpoints.map(endpoint => (<Badge variant="secondary">{endpoint.endpoint}</Badge>))}
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <Label className="font-bold">Keys</Label>
-          <Textarea rows={10}>{listener.public_key}</Textarea>
-          <Textarea rows={10}>{listener.private_key}</Textarea>
+          <Label className="font-bold">RSA Keys</Label>
+          <Textarea className="border rounded-md border-muted-foreground" rows={10}>{listener.public_key}</Textarea>
+          <Textarea className="border rounded-md border-muted-foreground" rows={10}>{listener.private_key}</Textarea>
         </div>
       </div>)
 
