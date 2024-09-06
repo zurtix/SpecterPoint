@@ -4,4 +4,5 @@ pub mod listener;
 pub mod message;
 pub mod metadata;
 pub mod server;
+pub mod task;
 pub mod user;

@@ -2,6 +2,7 @@ use crate::app::App;
 use axum::routing::Router;
 
 pub mod listeners;
+pub mod tasks;
 pub mod users;
 
 pub fn routes(state: App) -> Router {
