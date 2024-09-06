@@ -5,7 +5,7 @@ use common::{
     error::Error,
     models::user::{Credentials, User},
 };
-use eventlogs::event::ConnectionBuilder;
+use comms::event::ConnectionBuilder;
 
 #[tauri::command]
 pub async fn login(

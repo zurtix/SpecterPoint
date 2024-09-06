@@ -1,5 +1,5 @@
 [workspace]
-members = ["client/src-tauri", "server", "agent", "common", "eventlogs"]
+members = ["client/src-tauri", "server", "agent", "common", "comms"]
 
 [workspace.dependencies]
 tokio = { version = "1.37.0", features = ["full"] }

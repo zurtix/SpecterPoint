@@ -15,6 +15,6 @@ const DB_URL: &str = "sqlite://specterpoint-server.db";
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     sqlite::init(DB_URL, Some("./migrations")).await;
     let pool = sqlite::connect(DB_URL).await;
-    eventlogs::communication::COMMS.start(pool.clone()).await;
+    comms::communication::COMMS.start(pool.clone()).await;
     App::new(pool).serve().await
 }

@@ -14,7 +14,7 @@ async fn main() {
     sqlite::init(DB_URL, Some("./migrations")).await;
 
     let pool = sqlite::connect(DB_URL).await;
-    let eventlogs = eventlogs::event::EventManager::new();
+    let eventlogs = comms::event::EventManager::new();
     let state = models::state::AppState::new(pool, eventlogs);
 
     tauri::Builder::default()

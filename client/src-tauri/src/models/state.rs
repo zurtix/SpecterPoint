@@ -1,4 +1,4 @@
-use eventlogs::event::EventManager;
+use comms::event::EventManager;
 use sqlx::sqlite::SqlitePool;
 use std::sync::{Arc, RwLock};
 

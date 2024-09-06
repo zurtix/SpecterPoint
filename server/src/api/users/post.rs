@@ -3,7 +3,7 @@ use axum::{extract::State, response::IntoResponse, Json};
 use common::crypt::hash::generate_password_hash;
 use common::models::user::BaseCredential;
 use common::{error::Result, models::user::Credentials};
-use eventlogs::debug;
+use comms::debug;
 
 pub async fn add_user(
     State(state): State<App>,

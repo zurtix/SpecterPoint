@@ -6,7 +6,7 @@ use axum_login::{
     AuthManagerLayerBuilder,
 };
 use common::models::user::Backend;
-use eventlogs::info;
+use comms::info;
 use sqlx::SqlitePool;
 use tower_sessions::cookie::{time::Duration, Key};
 use tower_sessions_sqlx_store::SqliteStore;

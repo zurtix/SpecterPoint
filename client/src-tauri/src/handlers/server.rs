@@ -3,7 +3,7 @@ use common::crypt::aes::encrypt;
 use common::db::server::{create_server, delete_server, get_servers};
 use common::error::Result;
 use common::models::server::{Server, ServerBase};
-use eventlogs::event::ConnectionBuilder;
+use comms::event::ConnectionBuilder;
 
 #[tauri::command]
 pub async fn add_server(

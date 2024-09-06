@@ -1,7 +1,7 @@
 use crate::app::App;
 use axum::{extract::State, response::IntoResponse, Json};
 use common::{db::listener::get_listener_ids, error::Result, models::listener::ListenerState};
-use eventlogs::debug;
+use comms::debug;
 
 pub async fn get_listeners(State(state): State<App>) -> Result<impl IntoResponse> {
     debug!("Getting all listeners");

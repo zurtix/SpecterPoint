@@ -27,4 +27,4 @@ tower-sessions = { version = "0.12.2", default-features = false, features = [
   "signed",
 ] }
 pem = "3.0.4"
-eventlogs = { path = "../eventlogs" }
+comms = { path = "../comms" }

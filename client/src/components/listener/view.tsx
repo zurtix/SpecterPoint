@@ -5,7 +5,7 @@ import { useToast } from "../ui/use-toast"
 import { Textarea } from "../ui/textarea"
 import { Badge } from "../ui/badge"
 import { Label } from "../ui/label"
-import { Trash, Trash2 } from "lucide-react"
+import { Trash2 } from "lucide-react"
 
 export function ListenerView({ listener, remove }: { listener?: Listener, remove: (id: number) => void }) {
 
