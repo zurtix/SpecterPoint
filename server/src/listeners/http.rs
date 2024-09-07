@@ -1,5 +1,6 @@
 use super::Listen;
 use crate::handlers::http;
+use crate::managers::tasks::TaskManager;
 use axum::extract::{Request, State};
 use axum::http::{Method, StatusCode};
 use axum::middleware::{self, Next};
@@ -18,23 +19,25 @@ pub struct HttpListener {
     endpoints: Vec<Endpoint>,
     headers: Vec<Metadata>,
     key: RsaPrivateKey,
+    task_manager: TaskManager,
     handle: Handle,
 }
 
 impl HttpListener {
     pub async fn new(
-        host: String,
-        port: u16,
-        key: RsaPrivateKey,
+        server: String,
         endpoints: Vec<Endpoint>,
         headers: Vec<Metadata>,
+        key: RsaPrivateKey,
+        task_manager: TaskManager,
     ) -> Self {
-        let addr: SocketAddr = format!("{}:{}", host, port).parse().unwrap();
+        let addr: SocketAddr = server.parse().unwrap();
         Self {
             addr,
             endpoints,
             headers,
             key,
+            task_manager,
             handle: Handle::new(),
         }
     }
@@ -48,7 +51,7 @@ impl Listen for HttpListener {
         let handle = self.handle.clone();
 
         for e in self.endpoints.iter() {
-            app = app.merge(http::routes(&e.endpoint));
+            app = app.merge(http::routes(&e.endpoint).with_state(self.task_manager.clone()));
         }
 
         app = app.route_layer(middleware::from_fn_with_state(

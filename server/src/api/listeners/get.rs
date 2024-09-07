@@ -12,7 +12,7 @@ pub async fn get_listeners(State(state): State<App>) -> Result<impl IntoResponse
     for id in listeners {
         states.push(ListenerState {
             id,
-            running: state.orch.is_running(&id).await,
+            running: state.listener_manager.status(&id).await,
         })
     }
 

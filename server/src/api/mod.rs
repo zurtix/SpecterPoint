@@ -11,7 +11,8 @@ pub fn routes(state: App) -> Router {
             "/api",
             Router::new()
                 .nest("/listeners", listeners::routes())
-                .nest("/users", users::routes()),
+                .nest("/users", users::routes())
+                .nest("/tasks", tasks::routes()),
         )
         .with_state(state)
 }

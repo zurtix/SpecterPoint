@@ -14,7 +14,7 @@ use super::{
 };
 
 pub async fn get_listener(pool: SqlitePool, id: &i64) -> Result<ListenerFull> {
-    let listener = sqlx::query_as::<_, Listener>(
+    let inner = sqlx::query_as::<_, Listener>(
         r#"
     SELECT id, name, host, type, port, private_key, public_key FROM listeners WHERE id = ?1
     "#,
@@ -42,7 +42,7 @@ pub async fn get_listener(pool: SqlitePool, id: &i64) -> Result<ListenerFull> {
     .await?;
 
     Ok(ListenerFull {
-        listener,
+        inner,
         endpoints,
         metadata,
     })
@@ -62,7 +62,7 @@ pub async fn get_listseners(pool: SqlitePool) -> Result<Vec<ListenerFull>> {
         let endpoints = get_endpoints(base.id, pool.clone()).await;
         let metadata = get_metadata(base.id, pool.clone()).await;
         listeners_full.push(ListenerFull {
-            listener: base,
+            inner: base,
             endpoints,
             metadata,
         });
@@ -90,13 +90,13 @@ pub async fn add_listener(pool: SqlitePool, lstn: ListenerFull) -> Result<()> {
     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
     "#,
     )
-    .bind(lstn.listener.id)
-    .bind(lstn.listener.listener.name)
-    .bind(lstn.listener.listener.host)
-    .bind(lstn.listener.listener.port)
-    .bind(lstn.listener.listener.r#type)
-    .bind(lstn.listener.listener.private_key)
-    .bind(lstn.listener.listener.public_key)
+    .bind(lstn.inner.id)
+    .bind(lstn.inner.listener.name)
+    .bind(lstn.inner.listener.host)
+    .bind(lstn.inner.listener.port)
+    .bind(lstn.inner.listener.r#type)
+    .bind(lstn.inner.listener.private_key)
+    .bind(lstn.inner.listener.public_key)
     .execute(&mut *transaction)
     .await?;
 

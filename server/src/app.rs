@@ -1,5 +1,8 @@
-use crate::orchestrator::Orchestrator;
-use crate::{api, auth, models::config::Config};
+use crate::{
+    api, auth,
+    managers::{listeners::ListenerManager, tasks::TaskManager},
+    models::config::Config,
+};
 use axum_login::{
     login_required,
     tower_sessions::{ExpiredDeletion, Expiry, SessionManagerLayer},
@@ -13,14 +16,16 @@ use tower_sessions_sqlx_store::SqliteStore;
 
 #[derive(Clone)]
 pub struct App {
-    pub orch: Orchestrator,
+    pub listener_manager: ListenerManager,
+    pub task_manager: TaskManager,
     pub pool: SqlitePool,
 }
 
 impl App {
     pub fn new(pool: SqlitePool) -> Self {
         Self {
-            orch: Orchestrator::new(pool.clone()),
+            listener_manager: ListenerManager::default(),
+            task_manager: TaskManager::default(),
             pool,
         }
     }

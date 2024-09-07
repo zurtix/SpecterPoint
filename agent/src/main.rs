@@ -4,12 +4,11 @@ use rand::{distributions::Alphanumeric, Rng};
 use rsa::{pkcs1::DecodeRsaPublicKey, Pkcs1v15Encrypt, RsaPublicKey};
 
 const PUBLIC_RSA_KEY: &str = r#"
-PUBLIC RSA KEY FOR LISTENER
+-----BEGIN RSA PUBLIC KEY-----
+-----END RSA PUBLIC KEY-----
 "#;
 
-fn encrypt(message: &str) -> String {
-    let mut rng = rand::thread_rng();
-
+fn aes_encrypt(message: &str) -> String {
     let key: String = rand::thread_rng()
         .sample_iter(&Alphanumeric)
         .take(32)
@@ -17,13 +16,15 @@ fn encrypt(message: &str) -> String {
         .collect();
 
     let aes_ciphertext = aes::encrypt(&key, message).expect("Failed to encrypt");
-    let payload = format!("{}{}", key, aes_ciphertext);
-    let pubk = RsaPublicKey::from_pkcs1_pem(PUBLIC_RSA_KEY).expect("Failed to read public key");
-    let rsa_ciphertext = pubk
-        .encrypt(&mut rng, Pkcs1v15Encrypt, payload.as_bytes())
-        .expect("RSA encrypt failed");
+    format!("{}{}", key, aes_ciphertext)
+}
 
-    BASE64_STANDARD.encode(rsa_ciphertext).to_string()
+fn rsa_encrypt(message: &str) -> Vec<u8> {
+    let mut rng = rand::thread_rng();
+    let pubk = RsaPublicKey::from_pkcs1_pem(PUBLIC_RSA_KEY).expect("Failed to read public key");
+
+    pubk.encrypt(&mut rng, Pkcs1v15Encrypt, message.as_bytes())
+        .expect("RSA encrypt failed")
 }
 
 #[tokio::main]
@@ -34,7 +35,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map(char::from)
         .collect();
 
-    let fake_bearer = encrypt(&agent_id);
+    let fake_bearer = BASE64_STANDARD.encode(rsa_encrypt(&aes_encrypt(&agent_id)));
+
     let client = reqwest::Client::new();
 
     let res = client
@@ -47,11 +49,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await
         .unwrap();
 
-    if res.status().is_success() {
-        println!("Sent!");
-    } else {
-        println!("{:?}", res)
-    }
+    println!("{:?}", res);
 
     Ok(())
 }

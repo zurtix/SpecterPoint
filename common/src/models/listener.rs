@@ -32,7 +32,7 @@ pub struct Listener {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ListenerFull {
     #[serde(flatten)]
-    pub listener: Listener,
+    pub inner: Listener,
     pub endpoints: Vec<Endpoint>,
     pub metadata: Vec<Metadata>,
 }
@@ -49,4 +49,14 @@ pub struct ListenerBaseFull {
 pub struct ListenerState {
     pub id: i64,
     pub running: bool,
+}
+
+impl std::fmt::Display for ListenerFull {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}:{}",
+            self.inner.listener.host, self.inner.listener.port
+        )
+    }
 }

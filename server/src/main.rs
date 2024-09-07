@@ -3,8 +3,8 @@ mod app;
 mod auth;
 mod handlers;
 mod listeners;
+mod managers;
 mod models;
-mod orchestrator;
 
 use crate::app::App;
 use common::db::sqlite;

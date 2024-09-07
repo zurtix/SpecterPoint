@@ -1,12 +1,20 @@
-use axum::{http::StatusCode, Extension};
+use axum::{extract::State, http::StatusCode, response::IntoResponse, Extension, Json};
 use comms::{checkin, debug, models::agent::Agent};
 
-pub async fn check_in(Extension(id): Extension<String>) -> StatusCode {
+use crate::managers::tasks::TaskManager;
+
+pub async fn check_in(
+    State(task_manager): State<TaskManager>,
+    Extension(id): Extension<String>,
+) -> impl IntoResponse {
     debug!("Agent checking in [{}]", id);
-    checkin!(Agent::new(id));
+    checkin!(Agent::new(id.clone()));
 
-    //TODO: Return a list of tasks for the agent to execute
-    //TODO: As tasks are being sent to agent, pop them out of storage
+    let tasks = task_manager.tasks(id.clone()).await;
 
-    StatusCode::OK
+    if !tasks.is_empty() {
+        debug!("Agent [{}] acquired {} tasks", id, tasks.len());
+    }
+
+    (StatusCode::OK, Json(tasks))
 }
