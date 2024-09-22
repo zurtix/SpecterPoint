@@ -11,6 +11,10 @@ const DB_URL: &str = "sqlite://specterpoint-client.db";
 
 #[tokio::main]
 async fn main() {
+    if cfg!(target_os = "linux") {
+        std::env::set_var("WEBKIT_DISABLE_COMPOSITING_MODE", "1");
+    }
+
     sqlite::init(DB_URL, Some("./migrations")).await;
 
     let pool = sqlite::connect(DB_URL).await;

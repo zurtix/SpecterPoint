@@ -6,11 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio.workspace = true
 rand = "0.8.5"
 rsa = "0.9.6"
 pem = "3.0.4"
 base64 = "0.22.1"
-reqwest = "0.12.7"
+ureq = "2.10.1"
 chrono = "0.4.38"
+rayon = "1.10.0"
 common = { path = "../common" }

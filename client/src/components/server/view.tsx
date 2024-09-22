@@ -1,4 +1,4 @@
-import { Server } from "@/components/server/types"
+import { Server } from "@/types/server"
 import { Button } from "@/components/ui/button"
 
 export function ServerView({ server, remove }: { server?: Server, remove: (id: number) => void }) {
