@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { Log, Message, Interaction } from "@/types/event"
 import { listen } from "@tauri-apps/api/event"
-import { invoke } from "@tauri-apps/api/tauri"
+import { invoke } from "@tauri-apps/api/core"
 
 const initialLogs: Log[] = []
 const initialInteractions: Interaction[] = []

@@ -9,7 +9,7 @@ import {
 import LoginForm from '@/components/index/form-login'
 import SetupForm from '@/components/index/form-setup'
 import { useState, useEffect } from 'react'
-import { invoke } from '@tauri-apps/api/tauri'
+import { invoke } from '@tauri-apps/api/core'
 import { useToast } from "@/components/ui/use-toast"
 
 export function Index() {

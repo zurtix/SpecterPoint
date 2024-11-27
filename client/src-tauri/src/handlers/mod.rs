@@ -11,8 +11,9 @@ use rsa::{
     pkcs8::LineEnding,
     RsaPrivateKey,
 };
+use tauri::ipc::Invoke;
 
-pub fn make_handlers() -> impl Fn(tauri::Invoke<tauri::Wry>) {
+pub fn make_handlers() -> impl Fn(Invoke<tauri::Wry>) -> bool {
     tauri::generate_handler![
         is_setup_required,
         generate_keys,

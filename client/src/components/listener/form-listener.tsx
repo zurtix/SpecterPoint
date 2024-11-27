@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
-import { invoke } from "@tauri-apps/api/tauri"
+import { invoke } from "@tauri-apps/api/core"
 import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { ListenerTypes } from "@/types/listener"

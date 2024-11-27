@@ -14,7 +14,7 @@ import { AgentItem } from "@/components/agent/item"
 import { XIcon } from "lucide-react"
 import { useEvents } from "../provider/events"
 import { useEffect, useState } from "react"
-import { invoke } from "@tauri-apps/api/tauri"
+import { invoke } from "@tauri-apps/api/core"
 import { Agent } from "@/types/agent"
 
 export function Agents() {

@@ -6,7 +6,7 @@ import { FormItem } from "@/components/ui/tanstack-form"
 import { useToast } from "@/components/ui/use-toast"
 import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
-import { invoke } from '@tauri-apps/api/tauri'
+import { invoke } from '@tauri-apps/api/core'
 import { zodValidator } from '@tanstack/zod-form-adapter'
 
 export default function LoginForm() {

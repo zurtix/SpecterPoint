@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useEffect, useState } from 'react'
 import { CreateServer } from "@/components/server/create"
-import { invoke } from '@tauri-apps/api/tauri'
+import { invoke } from '@tauri-apps/api/core'
 import { CreateListener } from "./listener/create"
 import { Badge } from "./ui/badge"
 

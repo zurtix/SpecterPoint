@@ -1,9 +1,10 @@
 use futures_util::SinkExt;
 use rand::Rng;
 use std::{collections::HashMap, sync::Arc};
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle};
 use tokio_stream::StreamExt;
 use tokio_util::codec::Framed;
+use tauri::Emitter;
 
 use tokio::{
     net::TcpStream,
@@ -53,13 +54,13 @@ impl EventManager {
                     timestamp: chrono::Utc::now().to_rfc3339(),
                 });
 
-                let _ = connection.handle.emit_all("event", msg);
+                let _ = connection.handle.emit("event", msg);
 
                 loop {
                     tokio::select! {
                         _ = rx.recv() =>  break,
                         Some(Ok(message)) = framed.next() => {
-                            let _ = connection.handle.emit_all("event", message);
+                            let _ = connection.handle.emit("event", message);
                         }
                     }
                 }

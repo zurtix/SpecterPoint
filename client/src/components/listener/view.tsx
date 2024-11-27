@@ -1,6 +1,6 @@
 import { Listener } from "@/types/listener"
 import { Button } from "@/components/ui/button"
-import { invoke } from "@tauri-apps/api/tauri"
+import { invoke } from "@tauri-apps/api/core"
 import { useToast } from "../ui/use-toast"
 import { Textarea } from "../ui/textarea"
 import { Badge } from "../ui/badge"

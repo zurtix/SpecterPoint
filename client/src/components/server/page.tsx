@@ -10,7 +10,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import { Server } from "@/types/server"
-import { invoke } from "@tauri-apps/api/tauri"
+import { invoke } from "@tauri-apps/api/core"
 import { useToast } from "../ui/use-toast"
 
 export function Servers() {
